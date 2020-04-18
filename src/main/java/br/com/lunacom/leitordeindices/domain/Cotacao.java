@@ -17,7 +17,7 @@ public class Cotacao implements Serializable {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
 
-    private double preco;
+    private String preco;
     private Date data;
     private String volume;
 
