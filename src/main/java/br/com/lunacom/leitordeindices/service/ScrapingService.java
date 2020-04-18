@@ -32,6 +32,12 @@ public class ScrapingService {
             final List<WebElement> trs = ((RemoteWebElement) indices).findElements(By.tagName("tr"));
 
             trs.stream().forEach(tr -> {
+                String cod_referencia = trs.get(6).getAttribute("id").replace("pair_", "");
+                final String empresa = trs.get(6).findElement(By.className("plusIconTd")).getText();
+                final String cotacao = trs.get(6).findElement(By.className("pid-" + cod_referencia + "-last")).getText();
+                final String volume = trs.get(6).findElement(By.className("pid-" + cod_referencia + "-turnover")).getText();
+
+
                 System.out.println(tr.getText());
             });
 
