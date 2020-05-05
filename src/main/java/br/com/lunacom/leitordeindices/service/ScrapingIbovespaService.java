@@ -27,13 +27,15 @@ import java.util.regex.Pattern;
 
 @Log
 @Service
-public class ScrapingService {
+public class ScrapingIbovespaService {
 
     @Autowired
     private AtivoService ativoService;
 
     @Autowired
     private CotacaoService cotacaoService;
+
+    private final String origem = "ibovespa-diario";
 
     public void executar() {
         System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
@@ -56,22 +58,20 @@ public class ScrapingService {
                     final String preco_cotacao = tr.findElement(By.className("pid-" + cod_referencia + "-last")).getText();
                     final String volume = tr.findElement(By.className("pid-" + cod_referencia + "-turnover")).getText();
                 try {
-                    final Ativo ativoPesquisado = ativoService.getNomeETipo(nomeDaEmpresa);
-                    final Ativo ativo = ativoService.searchAtivo(ativoPesquisado.getNome(), ativoPesquisado.getTipo());
+                    final Ativo ativo = ativoService.searchAtivo(nomeDaEmpresa);
                     Cotacao cotacao = new Cotacao();
                     NumberFormat nf = NumberFormat.getInstance(Locale.GERMANY);
                     cotacao.setPreco(nf.parse(preco_cotacao).doubleValue());
                     cotacao.setAtivo(ativo);
+                    cotacao.setVolume(volume);
+                    cotacao.setOrigem(this.origem);
                     cotacaoService.insert(cotacao);
                 } catch (ObjectNotFoundException e) {
-                    e.printStackTrace();
-                } catch (ValidationException e) {
                     e.printStackTrace();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-
-                    System.out.println(tr.getText());
+                System.out.println(tr.getText());
             });
 
         } finally {

@@ -17,13 +17,20 @@ public class AtivoService {
     @Autowired
     private AtivoRepository repo;
 
+    public Ativo searchAtivo(String nome) throws ObjectNotFoundException {
+        Optional<Ativo> obj = repo.findByNome(nome);
+        Ativo ativo = obj.orElseThrow(
+                () -> new ObjectNotFoundException(
+                        String.format("Não foi encontrado um ativo com o nome informado %s",nome)));
+        return ativo;
+    }
     public Ativo searchAtivo(String nome, String tipo) throws ObjectNotFoundException {
-//        Optional<Ativo> obj = repo.findByNome(nome);
+
         Optional<Ativo> obj = repo.findFirstByNomeIgnoreCaseAndTipoContains(nome, tipo);
 
         Ativo ativo = obj.orElseThrow(
                 () -> new ObjectNotFoundException(
-                        String.format("Não foi encontrado um ativo com o nome informado %s",nome)));
+                        String.format("Não foi encontrado um ativo com o nome (%s) e tipo (%s) informado",nome, tipo)));
         return ativo;
     }
 

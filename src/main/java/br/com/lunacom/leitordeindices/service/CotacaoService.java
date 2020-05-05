@@ -14,7 +14,7 @@ public class CotacaoService {
     private CotacaoRepository repo;
 
     public Cotacao insert(Cotacao c) {
-        c.setData(new Date());
+        c.setImportacao(new Date());
         return repo.save(c);
     }
 }
