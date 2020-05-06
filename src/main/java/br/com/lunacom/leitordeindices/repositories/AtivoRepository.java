@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface AtivoRepository extends JpaRepository<Ativo, Integer> {
 
     public Optional<Ativo> findByNome(String nome);
+    public Optional<Ativo> findByCodigo(String codigo);
 //    public Optional<Ativo> findByNomeIgnoreCaseContainsAndTipoContains(String nome, String tipo);
 //    public Optional<Ativo> findByNomeIgnoreCaseStartingWithAndTipoContains(String nome, String tipo);
     public Optional<Ativo> findFirstByNomeIgnoreCaseAndTipoContains(String nome, String tipo);
