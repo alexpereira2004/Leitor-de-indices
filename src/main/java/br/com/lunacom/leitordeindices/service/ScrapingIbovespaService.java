@@ -84,7 +84,7 @@ public class ScrapingIbovespaService {
         }
     }
 
-    public void pesquisarHistoricoAtivo(String codigoAtivo) throws ObjectNotFoundException {
+    public void pesquisarHistoricoAtivo(String codigoAtivo, Date dataInicioPesquisa) throws ObjectNotFoundException {
         WebDriver driver = new FirefoxDriver();
         WebDriverWait wait = new WebDriverWait(driver, 10);
         try {
@@ -101,7 +101,7 @@ public class ScrapingIbovespaService {
             driver.findElement(By.cssSelector(".historicDate")).click();
             final WebElement startDate = driver.findElement(By.id("startDate"));
             startDate.clear();
-            startDate.sendKeys("01/01/2020");
+            startDate.sendKeys(DataUtil.formatAsDayMonthYearSlash(dataInicioPesquisa));
 
             driver.findElement(By.id("applyBtn")).click();
             NumberFormat nf = NumberFormat.getInstance(Locale.GERMANY);

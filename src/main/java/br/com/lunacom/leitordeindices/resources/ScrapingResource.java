@@ -1,13 +1,14 @@
 package br.com.lunacom.leitordeindices.resources;
 
 import br.com.lunacom.leitordeindices.service.ScrapingIbovespaService;
+import br.com.lunacom.leitordeindices.util.DataUtil;
 import javassist.tools.rmi.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
+import java.util.Date;
 
 @RestController
 @RequestMapping(value="/scraping")
@@ -23,9 +24,13 @@ public class ScrapingResource {
     }
 
 
-    @RequestMapping(value = "historico/ativos/{ativo}/", method = RequestMethod.GET)
-    public ResponseEntity<Void> pesquisarHistoricoAtivo(@PathVariable String ativo) throws ObjectNotFoundException {
-        scrapingService.pesquisarHistoricoAtivo(ativo);
+    @RequestMapping(value = "historico/ativos/", method = RequestMethod.GET)
+    public ResponseEntity<Void> pesquisarHistoricoAtivo(
+            @RequestParam("ativos") String ativos,
+            @RequestParam("inicio") String inicio
+    ) throws ObjectNotFoundException, ParseException {
+        final Date date = DataUtil.parseDayMonthYearSlash(inicio);
+        scrapingService.pesquisarHistoricoAtivo(ativos, date);
         return ResponseEntity.ok().build();
     }
 }
