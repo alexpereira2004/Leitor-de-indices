@@ -1,5 +1,6 @@
 package br.com.lunacom.leitordeindices.service;
 
+import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Cotacao;
 import br.com.lunacom.leitordeindices.repositories.CotacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +22,9 @@ public class CotacaoService {
 
     public void insertAll(List<Cotacao> cotacoes) {
         repo.saveAll(cotacoes);
+    }
+
+    public List<Cotacao> findAllByAtivoAndReferenciaAfter(Ativo a, Date d) {
+        return repo.findAllByAtivoAndReferenciaAfter(a, d);
     }
 }
