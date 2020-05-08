@@ -25,7 +25,7 @@ import java.util.Locale;
 
 @Slf4j
 @Service
-public class ScrapingIbovespaService {
+public class ScrapingIbovespaService implements Scraping {
 
     @Autowired
     private AtivoService ativoService;
@@ -35,7 +35,8 @@ public class ScrapingIbovespaService {
 
     private final String origem = "ibovespa-diario";
 
-    public void executar() {
+    @Override
+    public void executar(String codigoAtivo, Date dataInicioPesquisa) throws ObjectNotFoundException {
         System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
 
         WebDriver driver = new FirefoxDriver();
@@ -77,64 +78,8 @@ public class ScrapingIbovespaService {
         }
     }
 
-    public void pesquisarHistoricoAtivo(String codigoAtivo, Date dataInicioPesquisa) throws ObjectNotFoundException {
-        WebDriver driver = new FirefoxDriver();
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        try {
-            driver.get("https://br.investing.com/equities/brazil");
-
-            driver.findElement(By.cssSelector(".searchText")).clear();
-            driver.findElement(By.cssSelector(".searchText")).sendKeys(codigoAtivo);
-            driver.findElement(By.cssSelector(".searchGlassIcon")).click();
-            final WebElement indices = driver.findElement(By.cssSelector(".quatesTable"));
-            final List<WebElement> linkResultados = ((RemoteWebElement) indices).findElements(By.tagName("a"));
-            wait.until(ExpectedConditions.visibilityOf(linkResultados.get(0)));
-            final String href = linkResultados.get(0).getAttribute("href");
-            driver.get(href+"-historical-data");
-            driver.findElement(By.cssSelector(".historicDate")).click();
-            final WebElement startDate = driver.findElement(By.id("startDate"));
-            startDate.clear();
-            startDate.sendKeys(DataUtil.formatAsDayMonthYearSlash(dataInicioPesquisa));
-
-            driver.findElement(By.id("applyBtn")).click();
-            NumberFormat nf = NumberFormat.getInstance(Locale.GERMANY);
-
-            final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
-
-            List<Cotacao> cotacoes = new ArrayList<>();
-            log.info("Carregou a tabela");
-            final WebElement table = driver.findElement(By.id("curr_table"));
-            final WebElement tableBody = table.findElement(By.tagName("tbody"));
-            log.info("Aguardando corpo da tabela");
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.className("first")));
-            log.info("Corpo da tabela carregado");
-            final List<WebElement> trElements = tableBody.findElements(By.tagName("tr"));
-
-            trElements.stream().forEach(tr -> {
-                Cotacao c = new Cotacao();
-                final List<WebElement> tdElements = tr.findElements(By.tagName("td"));
-                try {
-                    c.setAtivo(ativo);
-                    c.setReferencia(DataUtil.parseDayMonthYearDot(tdElements.get(0).getText()));
-                    c.setPreco(nf.parse(tdElements.get(1).getText()).doubleValue());
-                    c.setAbertura(nf.parse(tdElements.get(2).getText()).doubleValue());
-                    c.setMaxima(nf.parse(tdElements.get(3).getText()).doubleValue());
-                    c.setMinima(nf.parse(tdElements.get(4).getText()).doubleValue());
-                    c.setVolume(tdElements.get(5).getText());
-                    c.setOrigem("historico-ativo");
-                    c.setImportacao(new Date());
-                    final String variacao = tdElements.get(6).getText().replace("%","");
-                    c.setVariacao(nf.parse(variacao).doubleValue());
-                    cotacoes.add(c);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            });
-            log.info(String.format("Total de cotações encontradas para %s: %s",codigoAtivo, cotacoes.size()));
-            cotacaoService.insertAll(cotacoes);
-        } finally {
-            driver.quit();
-        }
-
+    @Override
+    public String getOrigem() {
+        return origem;
     }
 }

@@ -1,5 +1,6 @@
 package br.com.lunacom.leitordeindices.resources;
 
+import br.com.lunacom.leitordeindices.service.ScrapingHistoricoAtivosService;
 import br.com.lunacom.leitordeindices.service.ScrapingIbovespaService;
 import br.com.lunacom.leitordeindices.util.DataUtil;
 import javassist.tools.rmi.ObjectNotFoundException;
@@ -17,9 +18,12 @@ public class ScrapingResource {
     @Autowired
     ScrapingIbovespaService scrapingService;
 
+    @Autowired
+    ScrapingHistoricoAtivosService scrapingHistoricoAtivosService;
+
     @RequestMapping(value = "ibovespa/carregar-indices-diarios/", method = RequestMethod.GET)
-    public ResponseEntity<Void> pesquisar() {
-        scrapingService.executar();
+    public ResponseEntity<Void> pesquisar() throws ObjectNotFoundException {
+        scrapingService.executar("", new Date());
         return ResponseEntity.ok().build();
     }
 
@@ -30,7 +34,7 @@ public class ScrapingResource {
             @RequestParam("inicio") String inicio
     ) throws ObjectNotFoundException, ParseException {
         final Date date = DataUtil.parseDayMonthYearSlash(inicio);
-        scrapingService.pesquisarHistoricoAtivo(ativos, date);
+        scrapingHistoricoAtivosService.executar(ativos, date);
         return ResponseEntity.ok().build();
     }
 }
