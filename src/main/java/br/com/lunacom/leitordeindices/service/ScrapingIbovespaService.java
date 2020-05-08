@@ -4,10 +4,8 @@ import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Cotacao;
 import br.com.lunacom.leitordeindices.util.DataUtil;
 import javassist.tools.rmi.ObjectNotFoundException;
-import lombok.extern.java.Log;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -17,20 +15,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.ValidationException;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
-@Log
+@Slf4j
 @Service
 public class ScrapingIbovespaService {
 
@@ -109,9 +102,15 @@ public class ScrapingIbovespaService {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
 
             List<Cotacao> cotacoes = new ArrayList<>();
-            final WebElement results_box = driver.findElement(By.id("results_box"));
-            final List<WebElement> trElements = results_box.findElements(By.tagName("tr"));
-            trElements.stream().skip(1).forEach(tr -> {
+            log.info("Carregou a tabela");
+            final WebElement table = driver.findElement(By.id("curr_table"));
+            final WebElement tableBody = table.findElement(By.tagName("tbody"));
+            log.info("Aguardando corpo da tabela");
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.className("first")));
+            log.info("Corpo da tabela carregado");
+            final List<WebElement> trElements = tableBody.findElements(By.tagName("tr"));
+
+            trElements.stream().forEach(tr -> {
                 Cotacao c = new Cotacao();
                 final List<WebElement> tdElements = tr.findElements(By.tagName("td"));
                 try {
@@ -131,7 +130,7 @@ public class ScrapingIbovespaService {
                     e.printStackTrace();
                 }
             });
-
+            log.info(String.format("Total de cotações encontradas para %s: %s",codigoAtivo, cotacoes.size()));
             cotacaoService.insertAll(cotacoes);
         } finally {
             driver.quit();
