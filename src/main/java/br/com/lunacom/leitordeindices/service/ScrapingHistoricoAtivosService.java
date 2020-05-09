@@ -60,7 +60,8 @@ public class ScrapingHistoricoAtivosService implements Scraping {
     private void scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
         try {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
-            this.filtrar(dataInicioPesquisa, driver, wait, ativo);
+            this.pesquisar(ativo, driver, wait);
+            this.filtrar(dataInicioPesquisa, driver);
 
             List<WebElement> trElements = bucarResultados(driver, wait);
             salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, trElements);
@@ -72,8 +73,7 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         }
     }
 
-
-    private void filtrar(Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait, Ativo ativo) {
+    private void pesquisar(Ativo ativo, WebDriver driver, WebDriverWait wait) {
         driver.findElement(By.cssSelector(".searchText")).clear();
         driver.findElement(By.cssSelector(".searchText")).sendKeys(ativo.getCodigo());
         driver.findElement(By.cssSelector(".searchGlassIcon")).click();
@@ -82,6 +82,9 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         wait.until(ExpectedConditions.visibilityOf(linkResultados.get(0)));
         final String href = linkResultados.get(0).getAttribute("href");
         driver.get(href+"-historical-data");
+    }
+
+    private void filtrar(Date dataInicioPesquisa, WebDriver driver) {
         driver.findElement(By.cssSelector(".historicDate")).click();
         final WebElement startDate = driver.findElement(By.id("startDate"));
         startDate.clear();

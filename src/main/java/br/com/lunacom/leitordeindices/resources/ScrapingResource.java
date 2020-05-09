@@ -21,7 +21,7 @@ public class ScrapingResource {
     @Autowired
     ScrapingHistoricoAtivosService scrapingHistoricoAtivosService;
 
-    @RequestMapping(value = "ibovespa/carregar-indices-diarios/", method = RequestMethod.GET)
+    @RequestMapping(value = "ibovespa/carregar-cotacoes-diarias/", method = RequestMethod.GET)
     public ResponseEntity<Void> pesquisar() throws ObjectNotFoundException {
         scrapingService.executar("", new Date());
         return ResponseEntity.ok().build();
@@ -32,7 +32,7 @@ public class ScrapingResource {
     public ResponseEntity<Void> pesquisarHistoricoAtivo(
             @RequestParam("ativos") String ativos,
             @RequestParam("inicio") String inicio
-    ) throws ObjectNotFoundException, ParseException {
+    ) throws ParseException {
         final Date date = DataUtil.parseDayMonthYearSlash(inicio);
         scrapingHistoricoAtivosService.executar(ativos, date);
         return ResponseEntity.ok().build();
