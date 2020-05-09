@@ -19,10 +19,7 @@ import javax.persistence.NoResultException;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,15 +35,14 @@ public class ScrapingHistoricoAtivosService implements Scraping {
 
     @Override
     public void executar(String referenciaCodigoAtivo, Date dataInicioPesquisa)  {
+        System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
         WebDriver driver = new FirefoxDriver();
         WebDriverWait wait = new WebDriverWait(driver, 10);
         driver.get("https://br.investing.com/equities/brazil");
 
         try {
 
-            List<String> ativos = new ArrayList<>();
-
-            ativos.add("EZTC3");
+            List<String> ativos = parseAtivos(referenciaCodigoAtivo);
 
             ativos.forEach(a -> {
                 scrapingAtivo(a, dataInicioPesquisa, driver, wait);
@@ -55,6 +51,11 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         } finally {
             driver.quit();
         }
+    }
+
+    private List<String> parseAtivos(String referenciaCodigoAtivo) {
+        List<String> ativos = new ArrayList<>(Arrays.asList(referenciaCodigoAtivo.split(",")));
+        return ativos;
     }
 
     private void scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
@@ -77,6 +78,7 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         driver.findElement(By.cssSelector(".searchText")).clear();
         driver.findElement(By.cssSelector(".searchText")).sendKeys(ativo.getCodigo());
         driver.findElement(By.cssSelector(".searchGlassIcon")).click();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".quatesTable")));
         final WebElement indices = driver.findElement(By.cssSelector(".quatesTable"));
         final List<WebElement> linkResultados = ((RemoteWebElement) indices).findElements(By.tagName("a"));
         wait.until(ExpectedConditions.visibilityOf(linkResultados.get(0)));
@@ -93,6 +95,7 @@ public class ScrapingHistoricoAtivosService implements Scraping {
     }
 
     private List<WebElement> bucarResultados(WebDriver driver, WebDriverWait wait) {
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("curr_table")));
         log.info("Carregou a tabela");
         final WebElement table = driver.findElement(By.id("curr_table"));
         final WebElement tableBody = table.findElement(By.tagName("tbody"));
