@@ -4,6 +4,8 @@ import br.com.lunacom.leitordeindices.service.ScrapingHistoricoAtivosService;
 import br.com.lunacom.leitordeindices.service.ScrapingIbovespaService;
 import br.com.lunacom.leitordeindices.util.DataUtil;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import javassist.tools.rmi.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,9 @@ public class ScrapingResource {
     }
 
     @ApiOperation(value="Pesquisa pelo histórico de cada um dos ativos e salva em banco")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Não é possível realizar a operação"),
+            @ApiResponse(code = 404, message = "Código do ativo inexistente") })
     @RequestMapping(value = "historico/ativos/", method = RequestMethod.GET)
     public ResponseEntity<Void> pesquisarHistoricoAtivo(
             @RequestParam("ativos") String ativos,
