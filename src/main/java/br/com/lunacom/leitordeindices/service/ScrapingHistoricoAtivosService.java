@@ -39,15 +39,11 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         WebDriver driver = new FirefoxDriver();
         WebDriverWait wait = new WebDriverWait(driver, 10);
         driver.get("https://br.investing.com/equities/brazil");
-
         try {
-
             List<String> ativos = parseAtivos(referenciaCodigoAtivo);
-
             ativos.forEach(a -> {
                 scrapingAtivo(a, dataInicioPesquisa, driver, wait);
             });
-
         } finally {
             driver.quit();
         }
@@ -63,7 +59,6 @@ public class ScrapingHistoricoAtivosService implements Scraping {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
             this.pesquisar(ativo, driver, wait);
             this.filtrar(dataInicioPesquisa, driver);
-
             List<WebElement> trElements = bucarResultados(driver, wait);
             salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, trElements);
         } catch (NoResultException e) {
