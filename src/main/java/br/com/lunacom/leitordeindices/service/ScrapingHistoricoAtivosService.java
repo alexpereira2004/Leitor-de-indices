@@ -128,9 +128,11 @@ public class ScrapingHistoricoAtivosService implements Scraping {
                 c.setImportacao(new Date());
                 final String variacao = tdElements.get(6).getText().replace("%","");
                 c.setVariacao(nf.parse(variacao).doubleValue());
-                if (compararSeExiste(c, cotacoesExistentes)) {
-                    cotacoes.add(c);
+                final Optional<Cotacao> cotacaoSeExistir = getCotacaoSeExistir(c, cotacoesExistentes);
+                if (cotacaoSeExistir.isPresent()) {
+                    c.setId(cotacaoSeExistir.get().getId());
                 }
+                cotacoes.add(c);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -143,6 +145,13 @@ public class ScrapingHistoricoAtivosService implements Scraping {
     @Override
     public String getOrigem() {
         return origem;
+    }
+
+    private Optional<Cotacao> getCotacaoSeExistir(Cotacao cotacao, List<Cotacao> cotacoesExistentes) {
+        return cotacoesExistentes
+                .stream()
+                .filter(c -> c.getReferencia().equals(cotacao.getReferencia()))
+                .findFirst();
     }
 
     private boolean compararSeExiste(Cotacao cotacao, List<Cotacao> cotacoesExistentes) {
