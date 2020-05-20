@@ -22,6 +22,7 @@ public class Ativo implements Serializable {
     private String codigo;
     private String tipo;
     private String pais;
+    private String caminho;
 
     @OneToMany(mappedBy = "ativo")
     private List<Cotacao> cotacoes;

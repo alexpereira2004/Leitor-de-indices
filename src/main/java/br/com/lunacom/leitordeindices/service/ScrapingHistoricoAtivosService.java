@@ -57,7 +57,7 @@ public class ScrapingHistoricoAtivosService implements Scraping {
     private void scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
         try {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
-            this.pesquisar(ativo, driver, wait);
+            this.acessarHistorico(ativo, driver, wait);
             this.filtrar(dataInicioPesquisa, driver);
             List<WebElement> trElements = bucarResultados(driver, wait);
             salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, trElements);
@@ -69,7 +69,14 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         }
     }
 
-    private void pesquisar(Ativo ativo, WebDriver driver, WebDriverWait wait) {
+    private void acessarHistorico(Ativo ativo, WebDriver driver, WebDriverWait wait) {
+        if (Objects.isNull(ativo.getCaminho())) {
+            pesquisarCaminhoDoAtivo(ativo, driver, wait);
+        }
+        driver.get(ativo.getCaminho()+"-historical-data");
+    }
+
+    private void pesquisarCaminhoDoAtivo(Ativo ativo, WebDriver driver, WebDriverWait wait) {
         driver.findElement(By.cssSelector(".searchText")).clear();
         driver.findElement(By.cssSelector(".searchText")).sendKeys(ativo.getCodigo());
         driver.findElement(By.cssSelector(".searchGlassIcon")).click();
@@ -77,8 +84,8 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         final WebElement indices = driver.findElement(By.cssSelector(".quatesTable"));
         final List<WebElement> linkResultados = ((RemoteWebElement) indices).findElements(By.tagName("a"));
         wait.until(ExpectedConditions.visibilityOf(linkResultados.get(0)));
-        final String href = linkResultados.get(0).getAttribute("href");
-        driver.get(href+"-historical-data");
+        ativo.setCaminho(linkResultados.get(0).getAttribute("href"));
+        ativoService.update(ativo);
     }
 
     private void filtrar(Date dataInicioPesquisa, WebDriver driver) {

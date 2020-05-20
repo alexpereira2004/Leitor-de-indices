@@ -17,6 +17,10 @@ public class AtivoService {
     @Autowired
     private AtivoRepository repo;
 
+    public Ativo update(Ativo a) {
+        return repo.save(a);
+    }
+
     public Ativo searchAtivo(String nome) throws ObjectNotFoundException {
         Optional<Ativo> obj = repo.findByNome(nome);
         Ativo ativo = obj.orElseThrow(
@@ -54,4 +58,6 @@ public class AtivoService {
         ativo.setTipo(m.group(2).replace("Unit", "UNT"));
         return ativo;
     }
+
+
 }
