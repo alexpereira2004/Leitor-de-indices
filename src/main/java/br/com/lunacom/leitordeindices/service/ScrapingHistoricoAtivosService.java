@@ -24,12 +24,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class ScrapingHistoricoAtivosService implements Scraping {
-    @Autowired
-    private AtivoService ativoService;
-
-    @Autowired
-    private CotacaoService cotacaoService;
+public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements Scraping {
 
     private final String origem = "historico-ativo";
 
@@ -47,11 +42,6 @@ public class ScrapingHistoricoAtivosService implements Scraping {
         } finally {
             driver.quit();
         }
-    }
-
-    private List<String> parseAtivos(String referenciaCodigoAtivo) {
-        List<String> ativos = new ArrayList<>(Arrays.asList(referenciaCodigoAtivo.split(",")));
-        return ativos;
     }
 
     private void scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
@@ -74,18 +64,6 @@ public class ScrapingHistoricoAtivosService implements Scraping {
             pesquisarCaminhoDoAtivo(ativo, driver, wait);
         }
         driver.get(ativo.getCaminho()+"-historical-data");
-    }
-
-    private void pesquisarCaminhoDoAtivo(Ativo ativo, WebDriver driver, WebDriverWait wait) {
-        driver.findElement(By.cssSelector(".searchText")).clear();
-        driver.findElement(By.cssSelector(".searchText")).sendKeys(ativo.getCodigo());
-        driver.findElement(By.cssSelector(".searchGlassIcon")).click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".quatesTable")));
-        final WebElement indices = driver.findElement(By.cssSelector(".quatesTable"));
-        final List<WebElement> linkResultados = ((RemoteWebElement) indices).findElements(By.tagName("a"));
-        wait.until(ExpectedConditions.visibilityOf(linkResultados.get(0)));
-        ativo.setCaminho(linkResultados.get(0).getAttribute("href"));
-        ativoService.update(ativo);
     }
 
     private void filtrar(Date dataInicioPesquisa, WebDriver driver) {

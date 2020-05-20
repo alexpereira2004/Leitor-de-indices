@@ -5,6 +5,6 @@ import javassist.tools.rmi.ObjectNotFoundException;
 import java.util.Date;
 
 public interface Scraping {
-    void executar(String codigoAtivo, Date dataInicioPesquisa) throws ObjectNotFoundException;
+    void executar(String codigoAtivo, Date dataReferencia) throws ObjectNotFoundException;
     String getOrigem();
 }

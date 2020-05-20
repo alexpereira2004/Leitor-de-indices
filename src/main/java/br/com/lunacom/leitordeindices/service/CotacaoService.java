@@ -27,4 +27,8 @@ public class CotacaoService {
     public List<Cotacao> findAllByAtivoAndReferenciaAfter(Ativo a, Date d) {
         return repo.findAllByAtivoAndReferenciaAfter(a, d);
     }
+
+    public List<Cotacao> findAllByAtivoAndReferencia(Ativo a, Date d) {
+        return repo.findAllByAtivoAndReferencia(a, d);
+    }
 }

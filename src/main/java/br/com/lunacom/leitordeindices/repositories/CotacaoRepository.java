@@ -12,4 +12,5 @@ import java.util.List;
 public interface CotacaoRepository extends JpaRepository<Cotacao, Integer> {
 
     List<Cotacao> findAllByAtivoAndReferenciaAfter(Ativo a, Date d);
+    List<Cotacao> findAllByAtivoAndReferencia(Ativo a, Date d);
 }
