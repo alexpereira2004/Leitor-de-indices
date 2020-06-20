@@ -1,3 +1,13 @@
+INSERT INTO indice (nome)
+VALUES ('Ibovespa'),
+       ('IBrX'),
+       ('IBrX'),
+       ('Brasil Amplo IBrA'),
+       ('MidLarge Cap MLCX'),
+       ('Small Cap SMLL'),
+       ('Tag Along ITAG');
+
+
 INSERT INTO ativo (nome, codigo)
 VALUES
 ('3M BDR','MMMC34'),
@@ -10,7 +20,7 @@ VALUES
 ('Aes Tiete Energia Pref Rights','TIET2'),
 ('AES Tiete ON','TIET3'),
 ('AES Tiete PN','TIET4'),
-('AES Tiete Unit ','TIET11'),
+('AES Tiete Unit','TIET11'),
 ('Afluente Transmissao de Energia','AFLT3'),
 ('AIG BDR','AIGB34'),
 ('Air Products','A1PD34'),
@@ -114,7 +124,7 @@ VALUES
 ('BR Pharma ON','BPHA3'),
 ('BR Propert ON','BRPR3'),
 ('Bradesco ON','BBDC3'),
-('Bradesco PN ','BBDC4'),
+('Bradesco PN','BBDC4'),
 ('Bradespar ON','BRAP3'),
 ('Bradespar PN','BRAP4'),
 ('Bras Eletrobr A Pref','ELET5'),
@@ -853,6 +863,42 @@ VALUES
 ((SELECT id FROM ativo WHERE codigo = 'EZTC3'),'Própria',53.74,58.34,8.56,50.00,2687.00,2917.00,230.00, '2020-01-07','2020-01-15')
 ;
 
+INSERT INTO indice (nome) VALUES
+('Ibovespa'),
+('IBrX'),
+('IBrX'),
+('Brasil Amplo IBrA'),
+('MidLarge Cap MLCX'),
+('Small Cap SMLL'),
+('Tag Along ITAG'),
+('Índice Brasil 100'),
+('Índice Brasil 50'),
+('Índice Brasil Amplo'),
+('Índice MidLarge Cap'),
+('Índice Small Cap'),
+('Tag Along Diferenciado'),
+('Índice de Consumo'),
+('Índice de Energia Elétrica'),
+('Índice de Materiais Básicos'),
+('Índice do Setor Industrial'),
+('Índice Financeiro'),
+('Índice Imobiliário'),
+('Índice Utilidade Pública'),
+('BDRs Não Patrocinados GLOBAL'),
+('Governança Corporativa Novo Mercado'),
+('Índice Carbono Eficiente'),
+('Índice Fundos de Investimentos Imobiliários'),
+('Governança Corporativa Diferenciada'),
+('Governança Corporativa Trade'),
+('Índice Dividendos'),
+('Índice Valor - 2ª Linha'),
+('Sustentabilidade Empresarial');
 
-INSERT INTO indices(nome)
-VALUES ('Teste');
+INSERT INTO ativo_indice
+SELECT a.id, (SELECT id FROM indice WHERE nome = 'Ibovespa') FROM ativo a WHERE nome IN ('Ambev ON','Azul PN','B2W Digital ON','B3 ON','Banco do Brasil ON','BB Seguridade ON','BR Malls Par ON','Bradesco ON','Bradesco PN','Bradespar PN','Braskem PN','BRF ON','BTG Pactual Unit','Carrefour ON','CCR ON','Cemig PN','Cia Hering ON','Cielo ON','Cogna Educacao','Cosan ON','CPFL Energia ON','CSN ON','CVC Brasil ON','Cyrela Realt ON','Ecorodovias ON','EDP Brasil ON','Eletrobras ON','Eletrobras PNB','Embraer ON','Energisa Unit','Engie Brasil ON','Equatorial ON','Fleury ON','Gerdau PN','Gol PN','Hapvida ON','Hypera ON','Iguatemi ON','Intermedica ON','IRB Brasil ON','Itau Unibanco PN','Itausa PN','JBS ON','Klabin Unit','Localiza ON','Lojas Americanas PN','Lojas Renner ON','Magazine Luiza ON','Marfrig ON','Met. Gerdau PN','Minerva ON','MRV ON','Multiplan ON','Natura ON','Pão de Açúcar CBD ON','Petrobras Distr ON','Petrobras ON','Petrobras PN','Qualicorp ON','Raia Drogasil ON','Rumo ON','Sabesp ON','Santander Brasil Unit','Sul America Unit','Suzano Papel ON','Taesa Unit','Telefonica Brasil PN','TIM ON','Totvs ON','Ultrapar ON','Usiminas PNA','Vale ON','Via Varejo ON','Weg ON','Yduqs Part ON');
+
+INSERT INTO ativo_indice
+SELECT a.id, (SELECT id FROM indice WHERE nome = 'Índice Brasil 100') FROM ativo a WHERE nome IN ('Aliansce Sonae','Alpargatas PN','Ambev ON','Azul PN','B2W Digital ON','B3 ON','Banco do Brasil ON','Banco Inter Unit','Banco Pan PN','Banrisul PNB','BB Seguridade ON','BR Malls Par ON','Bradesco ON','Bradesco PN','Bradespar PN','Braskem PN','BRF ON','BTG Pactual Unit','Carrefour ON','CCR ON','Cemig PN','Cesp PNB','Cia Hering ON','Cielo ON','Cogna Educacao','Copasa ON','Copel PNB','Cosan ON','CPFL Energia ON','CSN ON','CTEEP PN','CVC Brasil ON','Cyrela Realt ON','Duratex ON','Ecorodovias ON','EDP Brasil ON','Eletrobras ON','Eletrobras PNB','Embraer ON','Energisa Unit','Eneva ON','Engie Brasil ON','Equatorial ON','Eztec ON','Fleury ON','Gerdau PN','Gol PN','Hapvida ON','Hypera ON','Iguatemi ON','Intermedica ON','Iochpe-Maxion ON','IRB Brasil ON','Itau Unibanco PN','Itausa PN','JBS ON','Klabin Unit','Light ON','Linx ON','Localiza ON','Locamerica ON','Lojas Americanas PN','Lojas Renner ON','M.Dias Branco ON','Magazine Luiza ON','Marfrig ON','Met. Gerdau PN','Minerva ON','Movida ON','MRV ON','Multiplan ON','Natura ON','Neoenergia ON','Pão de Açúcar CBD ON','Petrobras Distr ON','Petrobras ON','Petrobras PN','Petrorio ON','Porto Seguro ON','Qualicorp ON','Raia Drogasil ON','Randon Part PN','Rumo ON','Sabesp ON','Sanepar Unit','Santander Brasil Unit','Smiles ON','Sul America Unit','Suzano Papel ON','Taesa Unit','Tecnisa ON','Telefonica Brasil PN','TIM ON','Totvs ON','Ultrapar ON','Usiminas PNA','Vale ON','Via Varejo ON','Weg ON','Yduqs Part ON');
+
+INSERT INTO ativo_indice
+SELECT a.id, (SELECT id FROM indice WHERE nome = 'Índice Brasil 50') FROM ativo a WHERE nome IN ('Cielo ON','Petrobras PN','Via Varejo ON','IRB Brasil ON','Usiminas PNA','Bradesco PN','Itau Unibanco PN','Itausa PN','Azul PN','Cogna Educacao','Banco do Brasil ON','Gol PN','BB Seguridade ON','Magazine Luiza ON','Gerdau PN','JBS ON','CSN ON','Petrobras ON','CCR ON','Multiplan ON','Marfrig ON','Vale ON','Ambev ON','Cemig PN','Cyrela Realt ON','Suzano Papel ON','BTG Pactual Unit','B3 ON','Lojas Americanas PN','Natura ON','Bradesco ON','Petrobras Distr ON','BR Malls Par ON','Sabesp ON','Rumo ON','Ultrapar ON','BRF ON','Equatorial ON','Sul America Unit','MRV ON','Eletrobras ON','Localiza ON','B2W Digital ON','Lojas Renner ON','Braskem PN','Weg ON','Intermedica ON','Yduqs Part ON','Hapvida ON','Pão de Açúcar CBD ON');

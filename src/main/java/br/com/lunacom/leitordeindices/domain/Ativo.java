@@ -28,12 +28,12 @@ public class Ativo implements Serializable {
     @OneToMany(mappedBy = "ativo")
     private List<Cotacao> cotacoes;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "ativo_indice",
             joinColumns = @JoinColumn(name = "ativo_id"),
             inverseJoinColumns = @JoinColumn(name = "indice_id"))
-    Set<Indices> indices;
+    Set<Indice> indices;
 
 
 }

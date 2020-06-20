@@ -10,7 +10,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-public class Indices implements Serializable {
+public class Indice implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -23,6 +23,6 @@ public class Indices implements Serializable {
     private String pais;
     private String caminho;
 
-    @ManyToMany(mappedBy = "indices")
+    @ManyToMany(mappedBy = "indices", fetch = FetchType.LAZY)
     Set<Ativo> ativos;
 }
