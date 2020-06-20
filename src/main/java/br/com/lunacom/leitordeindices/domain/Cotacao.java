@@ -1,8 +1,10 @@
 package br.com.lunacom.leitordeindices.domain;
 
+import br.com.lunacom.leitordeindices.domain.dto.CotacaoAtivoDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,4 +40,9 @@ public class Cotacao implements Serializable {
     @JoinColumn(name="ativo_id")
     @EqualsAndHashCode.Exclude
     private Ativo ativo;
+
+    public CotacaoAtivoDto toCotacaoAtivoDto() {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(this, CotacaoAtivoDto.class);
+    }
 }
