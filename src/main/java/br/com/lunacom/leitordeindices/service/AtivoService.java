@@ -33,7 +33,7 @@ public class AtivoService {
         Optional<Ativo> obj = repo.findByCodigo(codigo);
         Ativo ativo = obj.orElseThrow(
                 () -> new ObjectNotFoundException(
-                        String.format("Não foi encontrado um ativo com o cóodigo informado %s",codigo)));
+                        String.format("Não foi encontrado um ativo com o código informado %s",codigo)));
         return ativo;
     }
     public Ativo searchAtivo(String nome, String tipo) throws ObjectNotFoundException {
