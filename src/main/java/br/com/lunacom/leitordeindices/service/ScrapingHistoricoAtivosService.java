@@ -9,10 +9,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
@@ -28,9 +27,12 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
 
     private final String origem = "historico-ativo";
 
+    @Value("${webdriver.gecko.driver}")
+    private String webdriverGeckoDriver;
+
     @Override
     public void executar(String referenciaCodigoAtivo, Date dataInicioPesquisa)  {
-        System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
+        System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
         WebDriver driver = new FirefoxDriver();
         WebDriverWait wait = new WebDriverWait(driver, 10);
         driver.get("https://br.investing.com/equities/brazil");
@@ -94,7 +96,7 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
 
         List<Cotacao> cotacoes = new ArrayList<>();
 
-        final List<Cotacao> cotacoesExistentes = cotacaoService.findAllByAtivoAndReferenciaAfter(ativo, dataInicioPesquisa);
+        final List<Cotacao> cotacoesExistentes = cotacaoService.findAllByAtivoAndReferenciaGreaterThanEqual(ativo, dataInicioPesquisa);
 
         trElements.stream().forEach(tr -> {
             Cotacao c = new Cotacao();
