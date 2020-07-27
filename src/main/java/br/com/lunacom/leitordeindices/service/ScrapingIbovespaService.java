@@ -79,6 +79,11 @@ public class ScrapingIbovespaService implements Scraping {
     }
 
     @Override
+    public void executar(List<String> listaAtivos, Date dataReferencia) throws ObjectNotFoundException {
+
+    }
+
+    @Override
     public String getOrigem() {
         return origem;
     }

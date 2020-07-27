@@ -13,6 +13,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.SerializationUtils;
 
 import javax.persistence.NoResultException;
 import java.sql.Timestamp;
@@ -32,21 +33,32 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
 
     @Override
     public void executar(String referenciaCodigoAtivo, Date dataInicioPesquisa)  {
+
+    }
+
+    @Override
+    public void executar(List<String> ativos, Date dataInicioPesquisa)  {
         System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
+        List<String> ativosPendentes = new ArrayList<>(ativos);
+//        List<String> ativosCarregadosComSucesso = new ArrayList<>();
+
         WebDriver driver = new FirefoxDriver();
         WebDriverWait wait = new WebDriverWait(driver, 10);
         driver.get("https://br.investing.com/equities/brazil");
         try {
-            List<String> ativos = parseAtivos(referenciaCodigoAtivo);
-            ativos.forEach(a -> {
+            ativosPendentes.forEach(a -> {
                 scrapingAtivo(a, dataInicioPesquisa, driver, wait);
+                ativos.remove(a);
             });
+
+//        } catch (Exception e) {
+//            log.warn(e.getMessage());
         } finally {
             driver.quit();
         }
     }
 
-    private void scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
+    private String scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
         try {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
             this.acessarHistorico(ativo, driver, wait);
@@ -59,6 +71,7 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
             log.error(String.format("Código do ativo não existe: $s", codigoAtivo));
             e.printStackTrace();
         }
+        return codigoAtivo;
     }
 
     private void acessarHistorico(Ativo ativo, WebDriver driver, WebDriverWait wait) {

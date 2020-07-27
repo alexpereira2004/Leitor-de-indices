@@ -13,7 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping(value="/scraping")
@@ -54,7 +57,8 @@ public class ScrapingResource {
             @RequestParam("inicio") String inicio
     ) throws ParseException {
         final Date date = DataUtil.parseDayMonthYearSlash(inicio);
-        scrapingHistoricoAtivosService.executar(ativos, date);
+        List<String> listaAtivos = new ArrayList<>(Arrays.asList(ativos.split(",")));
+        scrapingHistoricoAtivosService.executar(listaAtivos, date);
         return ResponseEntity.ok().build();
     }
 }
