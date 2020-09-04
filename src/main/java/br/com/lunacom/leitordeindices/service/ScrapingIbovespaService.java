@@ -2,7 +2,6 @@ package br.com.lunacom.leitordeindices.service;
 
 import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Cotacao;
-import br.com.lunacom.leitordeindices.util.DataUtil;
 import javassist.tools.rmi.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -10,14 +9,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -79,7 +76,7 @@ public class ScrapingIbovespaService implements Scraping {
     }
 
     @Override
-    public void executar(List<String> listaAtivos, Date dataReferencia) throws ObjectNotFoundException {
+    public void executar(List<String> listaAtivos, Date dataReferencia, Boolean v) throws ObjectNotFoundException {
 
     }
 

@@ -39,4 +39,11 @@ public abstract class ScrapingAbstract {
     }
 
 
+    protected void fecharAvisoPrivacidade(WebDriver driver) {
+        final List<WebElement> elements = driver.findElements(By.cssSelector("#onetrust-accept-btn-handler"));
+        if (elements.isEmpty()) {
+            return;
+        }
+        elements.get(0).click();
+    };
 }
