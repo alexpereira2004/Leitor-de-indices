@@ -9,6 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,15 @@ public class ScrapingCotacaoAtualService extends ScrapingAbstract implements Scr
     @Override
     public void executar(String referenciaCodigoAtivo, Date diaAtual) throws ObjectNotFoundException {
         System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
-        WebDriver driver = new FirefoxDriver();
+        FirefoxOptions options = new FirefoxOptions();
+        options.setHeadless(true);
+        WebDriver driver = new FirefoxDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, 10);
         try {
             List<String> ativos = parseAtivos(referenciaCodigoAtivo);
             ativos.forEach(a -> {
                 scrapingAtivo(a, driver, wait);
+                log.info("Scraping finalizado para "+a);
             });
         } finally {
             driver.quit();
@@ -41,7 +45,7 @@ public class ScrapingCotacaoAtualService extends ScrapingAbstract implements Scr
     }
 
     @Override
-    public void executar(List<String> listaAtivos, Date dataReferencia) throws ObjectNotFoundException {
+    public void executar(List<String> listaAtivos, Date dataReferencia, Boolean v) throws ObjectNotFoundException {
 
     }
 

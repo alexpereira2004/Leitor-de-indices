@@ -3,7 +3,6 @@ package br.com.lunacom.leitordeindices.service;
 import javassist.tools.rmi.ObjectNotFoundException;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
 import java.util.Date;
@@ -17,7 +16,7 @@ public interface Scraping {
             value = { ElementNotInteractableException.class, ElementClickInterceptedException.class },
             maxAttempts = 10
     )
-    void executar(List<String> listaAtivos, Date dataReferencia) throws ObjectNotFoundException;
+    void executar(List<String> listaAtivos, Date dataReferencia, Boolean visivel) throws ObjectNotFoundException;
 
     String getOrigem();
 }

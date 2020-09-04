@@ -10,11 +10,12 @@ import io.swagger.annotations.ApiResponses;
 import javassist.tools.rmi.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -53,12 +54,12 @@ public class ScrapingResource {
             @ApiResponse(code = 404, message = "Código do ativo inexistente") })
     @RequestMapping(value = "historico/ativos/", method = RequestMethod.GET)
     public ResponseEntity<Void> pesquisarHistoricoAtivo(
-            @RequestParam("ativos") String ativos,
-            @RequestParam("inicio") String inicio
+            @RequestParam("ativos") List<String> listaAtivos,
+            @RequestParam("inicio") String inicio,
+            @RequestParam("visivel") Boolean visivel
     ) throws ParseException {
         final Date date = DataUtil.parseDayMonthYearSlash(inicio);
-        List<String> listaAtivos = new ArrayList<>(Arrays.asList(ativos.split(",")));
-        scrapingHistoricoAtivosService.executar(listaAtivos, date);
+        scrapingHistoricoAtivosService.executar(listaAtivos, date, visivel);
         return ResponseEntity.ok().build();
     }
 }

@@ -9,11 +9,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.SerializationUtils;
 
 import javax.persistence.NoResultException;
 import java.sql.Timestamp;
@@ -37,17 +37,20 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
     }
 
     @Override
-    public void executar(List<String> ativos, Date dataInicioPesquisa)  {
+    public void executar(List<String> ativos, Date dataInicioPesquisa, Boolean visivel)  {
         System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
         List<String> ativosPendentes = new ArrayList<>(ativos);
 //        List<String> ativosCarregadosComSucesso = new ArrayList<>();
+        FirefoxOptions options = new FirefoxOptions();
+        options.setHeadless(visivel);
 
-        WebDriver driver = new FirefoxDriver();
+        WebDriver driver = new FirefoxDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, 10);
         driver.get("https://br.investing.com/equities/brazil");
         try {
             ativosPendentes.forEach(a -> {
                 scrapingAtivo(a, dataInicioPesquisa, driver, wait);
+                log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
                 ativos.remove(a);
             });
 
@@ -62,6 +65,7 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
         try {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
             this.acessarHistorico(ativo, driver, wait);
+            this.fecharAvisoPrivacidade(driver);
             this.filtrar(dataInicioPesquisa, driver);
             List<WebElement> trElements = bucarResultados(driver, wait);
             salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, trElements);
