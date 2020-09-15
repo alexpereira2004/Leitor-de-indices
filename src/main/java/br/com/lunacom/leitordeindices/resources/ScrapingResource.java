@@ -56,10 +56,10 @@ public class ScrapingResource {
     public ResponseEntity<Void> pesquisarHistoricoAtivo(
             @RequestParam("ativos") List<String> listaAtivos,
             @RequestParam("inicio") String inicio,
-            @RequestParam("visivel") Boolean visivel
+            @RequestParam("invisivel") Boolean invisivel
     ) throws ParseException {
         final Date date = DataUtil.parseDayMonthYearSlash(inicio);
-        scrapingHistoricoAtivosService.executar(listaAtivos, date, visivel);
+        scrapingHistoricoAtivosService.executar(listaAtivos, date, invisivel);
         return ResponseEntity.ok().build();
     }
 }

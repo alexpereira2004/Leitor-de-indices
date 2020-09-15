@@ -37,12 +37,12 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
     }
 
     @Override
-    public void executar(List<String> ativos, Date dataInicioPesquisa, Boolean visivel)  {
+    public void executar(List<String> ativos, Date dataInicioPesquisa, Boolean invisivel)  {
         System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
         List<String> ativosPendentes = new ArrayList<>(ativos);
 //        List<String> ativosCarregadosComSucesso = new ArrayList<>();
         FirefoxOptions options = new FirefoxOptions();
-        options.setHeadless(visivel);
+        options.setHeadless(invisivel);
 
         WebDriver driver = new FirefoxDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, 10);
