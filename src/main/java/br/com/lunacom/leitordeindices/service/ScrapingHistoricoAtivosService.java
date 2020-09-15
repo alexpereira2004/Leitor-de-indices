@@ -63,9 +63,9 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
 
     private String scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
         try {
+            this.fecharAvisoPrivacidade(driver);
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
             this.acessarHistorico(ativo, driver, wait);
-            this.fecharAvisoPrivacidade(driver);
             this.filtrar(dataInicioPesquisa, driver);
             List<WebElement> trElements = bucarResultados(driver, wait);
             salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, trElements);

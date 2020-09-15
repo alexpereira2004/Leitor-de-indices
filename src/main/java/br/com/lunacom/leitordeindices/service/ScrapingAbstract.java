@@ -1,6 +1,7 @@
 package br.com.lunacom.leitordeindices.service;
 
 import br.com.lunacom.leitordeindices.domain.Ativo;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public abstract class ScrapingAbstract {
 
     @Autowired
@@ -40,10 +42,13 @@ public abstract class ScrapingAbstract {
 
 
     protected void fecharAvisoPrivacidade(WebDriver driver) {
+        log.info(">>>>> INIT: Pesquisou por aviso de privacidade");
         final List<WebElement> elements = driver.findElements(By.cssSelector("#onetrust-accept-btn-handler"));
         if (elements.isEmpty()) {
+            log.info("----> END: Não encontrou aviso de privacidade");
             return;
         }
+        log.info("----> Fechou aviso de privacidade");
         elements.get(0).click();
     };
 }
