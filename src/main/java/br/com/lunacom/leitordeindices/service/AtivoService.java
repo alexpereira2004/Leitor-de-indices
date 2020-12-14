@@ -6,6 +6,8 @@ import br.com.lunacom.leitordeindices.repositories.AtivoRepository;
 import javassist.tools.rmi.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.ValidationException;
@@ -19,6 +21,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AtivoService {
+
+    @Autowired
+    private Environment env;
 
     private final ModelMapper modelMapper;
 
