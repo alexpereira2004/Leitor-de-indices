@@ -17,12 +17,6 @@ import java.util.List;
 @Slf4j
 public abstract class ScrapingInvestingComAbstract extends ScrapingAbstract {
 
-    @Autowired
-    protected AtivoService ativoService;
-
-    @Autowired
-    protected CotacaoService cotacaoService;
-
     protected void pesquisarCaminhoDoAtivo(Ativo ativo, WebDriver driver, WebDriverWait wait) {
         driver.findElement(By.cssSelector(".searchText")).clear();
         driver.findElement(By.cssSelector(".searchText")).sendKeys(ativo.getCodigo());
