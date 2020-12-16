@@ -11,9 +11,9 @@ import java.util.List;
 public class ScrapingHistoricoAtivosFactory {
 
     @Autowired
-    private static List<Scraping> scrapingHistoricoAtivosServiceList;
+    private List<Scraping> scrapingHistoricoAtivosServiceList;
 
-    public static Scraping create(String site) {
+    public Scraping create(String site) {
         final Scraping service = scrapingHistoricoAtivosServiceList
                 .stream()
                 .filter(r -> r.getOrigem().equals(site))

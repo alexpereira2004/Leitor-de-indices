@@ -30,6 +30,9 @@ public class ScrapingResource {
     @Autowired
     ScrapingCotacaoAtualService scrapingCotacaoAtualService;
 
+    @Autowired
+    ScrapingHistoricoAtivosFactory factory;
+
     @ApiOperation(value="Busca todas as cotações do dia dos ativos da Ibovespa")
     @RequestMapping(value = "ibovespa/carregar-cotacoes-diarias/", method = RequestMethod.GET)
     public ResponseEntity<Void> pesquisar() throws ObjectNotFoundException {
@@ -57,7 +60,7 @@ public class ScrapingResource {
             @RequestParam("invisivel") Boolean invisivel
     ) throws ParseException, ObjectNotFoundException {
         final Date date = DataUtil.parseDayMonthYearSlash(inicio);
-        final Scraping scrapingService = ScrapingHistoricoAtivosFactory.create(site);
+        final Scraping scrapingService = factory.create(site);
         scrapingService.executar(listaAtivos, date, invisivel);
         return ResponseEntity.ok().build();
     }
