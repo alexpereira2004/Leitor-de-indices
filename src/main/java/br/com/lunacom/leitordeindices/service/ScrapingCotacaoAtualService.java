@@ -24,7 +24,7 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-public class ScrapingCotacaoAtualService extends ScrapingAbstract implements Scraping {
+public class ScrapingCotacaoAtualService extends ScrapingInvestingComAbstract implements Scraping {
 
     @Override
     public void executar(String referenciaCodigoAtivo, Date diaAtual) throws ObjectNotFoundException {

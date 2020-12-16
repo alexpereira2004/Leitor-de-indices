@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements Scraping {
+public class ScrapingInvestingComService extends ScrapingInvestingComAbstract implements Scraping {
 
-    private final String origem = "historico-ativo";
+    private final String origem = "investing-com";
 
     @Value("${webdriver.gecko.driver}")
     private String webdriverGeckoDriver;
@@ -37,31 +37,12 @@ public class ScrapingHistoricoAtivosService extends ScrapingAbstract implements 
     }
 
     @Override
-    public void executar(List<String> ativos, Date dataInicioPesquisa, Boolean invisivel)  {
-        System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
-        List<String> ativosPendentes = new ArrayList<>(ativos);
-//        List<String> ativosCarregadosComSucesso = new ArrayList<>();
-        FirefoxOptions options = new FirefoxOptions();
-        options.setHeadless(invisivel);
-
-        WebDriver driver = new FirefoxDriver(options);
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        driver.get("https://br.investing.com/equities/brazil");
-        try {
-            ativosPendentes.forEach(a -> {
-                scrapingAtivo(a, dataInicioPesquisa, driver, wait);
-                log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
-                ativos.remove(a);
-            });
-
-//        } catch (Exception e) {
-//            log.warn(e.getMessage());
-        } finally {
-            driver.quit();
-        }
+    public void executar(List<String> listaAtivos, Date dataReferencia, Boolean invisivel)  {
+        loop(listaAtivos, dataReferencia, invisivel);
     }
 
-    private String scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
+    @Override
+    protected String scrapingAtivo(String codigoAtivo, Date dataInicioPesquisa, WebDriver driver, WebDriverWait wait) {
         try {
             this.fecharAvisoPrivacidade(driver);
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);

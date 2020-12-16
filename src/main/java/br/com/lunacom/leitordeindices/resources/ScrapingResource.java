@@ -1,7 +1,8 @@
 package br.com.lunacom.leitordeindices.resources;
 
+import br.com.lunacom.leitordeindices.factory.ScrapingHistoricoAtivosFactory;
+import br.com.lunacom.leitordeindices.service.Scraping;
 import br.com.lunacom.leitordeindices.service.ScrapingCotacaoAtualService;
-import br.com.lunacom.leitordeindices.service.ScrapingHistoricoAtivosService;
 import br.com.lunacom.leitordeindices.service.ScrapingIbovespaService;
 import br.com.lunacom.leitordeindices.util.DataUtil;
 import io.swagger.annotations.ApiOperation;
@@ -29,10 +30,6 @@ public class ScrapingResource {
     @Autowired
     ScrapingCotacaoAtualService scrapingCotacaoAtualService;
 
-    @Autowired
-    ScrapingHistoricoAtivosService scrapingHistoricoAtivosService;
-
-
     @ApiOperation(value="Busca todas as cotações do dia dos ativos da Ibovespa")
     @RequestMapping(value = "ibovespa/carregar-cotacoes-diarias/", method = RequestMethod.GET)
     public ResponseEntity<Void> pesquisar() throws ObjectNotFoundException {
@@ -56,10 +53,12 @@ public class ScrapingResource {
     public ResponseEntity<Void> pesquisarHistoricoAtivo(
             @RequestParam("ativos") List<String> listaAtivos,
             @RequestParam("inicio") String inicio,
+            @RequestParam("site") String site,
             @RequestParam("invisivel") Boolean invisivel
-    ) throws ParseException {
+    ) throws ParseException, ObjectNotFoundException {
         final Date date = DataUtil.parseDayMonthYearSlash(inicio);
-        scrapingHistoricoAtivosService.executar(listaAtivos, date, invisivel);
+        final Scraping scrapingService = ScrapingHistoricoAtivosFactory.create(site);
+        scrapingService.executar(listaAtivos, date, invisivel);
         return ResponseEntity.ok().build();
     }
 }
