@@ -14,7 +14,7 @@ import java.util.Date;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Cotacao implements Serializable {
+public class Cotacao implements Serializable, Comparable<Cotacao> {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -44,5 +44,12 @@ public class Cotacao implements Serializable {
     public CotacaoAtivoDto toCotacaoAtivoDto() {
         ModelMapper mapper = new ModelMapper();
         return mapper.map(this, CotacaoAtivoDto.class);
+    }
+
+    @Override
+    public int compareTo(Cotacao o) {
+        if (this.getReferencia() == null || o.getReferencia() == null)
+            return 0;
+        return getReferencia().compareTo(o.getReferencia());
     }
 }
