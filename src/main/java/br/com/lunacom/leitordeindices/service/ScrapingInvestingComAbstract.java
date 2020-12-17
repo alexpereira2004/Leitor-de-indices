@@ -17,6 +17,8 @@ import java.util.List;
 @Slf4j
 public abstract class ScrapingInvestingComAbstract extends ScrapingAbstract {
 
+    private final String URL_BASE = "https://br.investing.com/equities/brazil";
+
     protected void pesquisarCaminhoDoAtivo(Ativo ativo, WebDriver driver, WebDriverWait wait) {
         driver.findElement(By.cssSelector(".searchText")).clear();
         driver.findElement(By.cssSelector(".searchText")).sendKeys(ativo.getCodigo());
@@ -45,4 +47,9 @@ public abstract class ScrapingInvestingComAbstract extends ScrapingAbstract {
         log.info("----> Fechou aviso de privacidade");
         elements.get(0).click();
     };
+
+    @Override
+    protected String getUrlBase() {
+        return URL_BASE;
+    }
 }

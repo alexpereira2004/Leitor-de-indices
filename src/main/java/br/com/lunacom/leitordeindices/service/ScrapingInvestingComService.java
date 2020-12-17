@@ -33,7 +33,7 @@ public class ScrapingInvestingComService extends ScrapingInvestingComAbstract im
     @Autowired
     TabelaTrSiteInvestingComToCotacaoAtivoDtoConverter converter;
 
-    private final String origem = "investing-com";
+    private final String origem = "investing";
 
     @Value("${webdriver.gecko.driver}")
     private String webdriverGeckoDriver;
@@ -56,9 +56,9 @@ public class ScrapingInvestingComService extends ScrapingInvestingComAbstract im
             this.acessarHistorico(ativo, driver, wait);
             this.filtrar(dataInicioPesquisa, driver);
             List<WebElement> trElements = bucarResultados(driver, wait);
-//            converter.encode(trElements);
-//            final List<CotacaoAtivoDto> cotacaoAtivoDtoList = converter.encode(trElements);
-//            salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, cotacaoAtivoDtoList);
+
+            final List<CotacaoAtivoDto> cotacaoAtivoDtoList = converter.encode(trElements);
+            salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, cotacaoAtivoDtoList);
         } catch (NoResultException e) {
             log.warn(e.getMessage(), codigoAtivo);
         } catch (ObjectNotFoundException e) {

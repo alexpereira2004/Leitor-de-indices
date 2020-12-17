@@ -1,7 +1,6 @@
 package br.com.lunacom.leitordeindices.service;
 
 import br.com.lunacom.leitordeindices.converter.TabelaTrSiteAdvfnToCotacaoAtivoDtoConverter;
-import br.com.lunacom.leitordeindices.converter.TabelaTrSiteInvestingComToCotacaoAtivoDtoConverter;
 import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.dto.CotacaoAtivoDto;
 import javassist.tools.rmi.ObjectNotFoundException;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import static br.com.lunacom.leitordeindices.util.Mensagens.ATIVO_NAO_EXISTE;
 import static br.com.lunacom.leitordeindices.util.Mensagens.ELEMENTO_ESTRUTURA_NAO_ENCONTRADO;
@@ -71,8 +69,6 @@ public class ScrapingSiteAdvfnService extends ScrapingAbstract implements Scrapi
             final List<CotacaoAtivoDto> cotacaoAtivoDtoList = converter.encode(trs);
 
             salvarCotacoesPorAtivo(ativo, dataInicioPesquisa, cotacaoAtivoDtoList);
-
-
 
         } catch (ObjectNotFoundException e) {
             log.error(String.format(ATIVO_NAO_EXISTE, codigoAtivo));
