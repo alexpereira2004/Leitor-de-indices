@@ -28,7 +28,7 @@ public class ScrapingCotacaoAtualService extends ScrapingInvestingComAbstract im
 
     @Override
     public void executar(String referenciaCodigoAtivo, Date diaAtual) throws ObjectNotFoundException {
-        System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
+//        System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
         FirefoxOptions options = new FirefoxOptions();
         options.setHeadless(true);
         WebDriver driver = new FirefoxDriver(options);
