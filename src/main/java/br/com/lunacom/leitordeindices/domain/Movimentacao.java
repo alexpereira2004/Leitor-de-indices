@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
-public class Vendas {
+public class Movimentacao {
     private static final long serialVersionUID = 1L;
 
     @Id
