@@ -17,6 +17,7 @@ public class Movimentacao {
     private Integer id;
 
     private String indicacao;
+    private String estrategia;
 
     private Double preco_pago;
     private Double preco_venda;
@@ -27,6 +28,7 @@ public class Movimentacao {
     private Double diferenca;
     private Date aquisicao;
     private Date venda;
+    private Integer dias;
 
     @ManyToOne
     @JoinColumn(name="ativo_id")
