@@ -21,5 +21,6 @@ public class Indicador implements Serializable {
     private String codigo;
     private String descricao;
     private String tipo;
+    private String tipoValor;
 
 }

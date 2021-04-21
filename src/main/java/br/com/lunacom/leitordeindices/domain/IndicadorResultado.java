@@ -15,7 +15,6 @@ public class IndicadorResultado implements Serializable {
     private Integer id;
 
     private double valor;
-    private String tipo;
 
     @ManyToOne
     @JoinColumn(name="indicador_ano_id")
