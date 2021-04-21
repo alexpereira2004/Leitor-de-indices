@@ -20,7 +20,7 @@ public class Indicador implements Serializable {
     private String nome;
     private String codigo;
     private String descricao;
-    private String tipo;
+    private Integer tipo;
     private String tipoValor;
 
 }
