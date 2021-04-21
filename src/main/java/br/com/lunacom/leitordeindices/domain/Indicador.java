@@ -16,6 +16,8 @@ public class Indicador implements Serializable {
 
     private String nome;
     private String codigo;
+
+    @Column(columnDefinition="text")
     private String descricao;
     private Integer tipo;
     private Integer tipoValor;
