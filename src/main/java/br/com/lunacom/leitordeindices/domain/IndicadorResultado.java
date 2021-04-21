@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Data
-public class IndicadorLeituraValor implements Serializable {
+public class IndicadorResultado implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
