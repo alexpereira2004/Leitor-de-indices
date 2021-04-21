@@ -2,10 +2,7 @@ package br.com.lunacom.leitordeindices.domain;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -21,6 +18,6 @@ public class Indicador implements Serializable {
     private String codigo;
     private String descricao;
     private Integer tipo;
-    private String tipoValor;
+    private Integer tipoValor;
 
 }
