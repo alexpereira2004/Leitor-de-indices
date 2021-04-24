@@ -3,7 +3,8 @@ package br.com.lunacom.leitordeindices.service;
 import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Indicador;
 import br.com.lunacom.leitordeindices.domain.IndicadorAno;
-import br.com.lunacom.leitordeindices.domain.IndicadorResultado;
+import br.com.lunacom.leitordeindices.repositories.IndicadorAnoRepository;
+import br.com.lunacom.leitordeindices.repositories.IndicadorRepository;
 import javassist.tools.rmi.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -26,8 +27,15 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
     @Autowired
     protected AtivoService ativoService;
 
+    @Autowired
+    IndicadorRepository indicadorRepository;
+
+    @Autowired
+    IndicadorAnoRepository indicadorAnoRepository;
+
     private final String URL_BASE = "https://statusinvest.com.br";
     private final By xpathFilhoDoNodo = By.xpath("./child::*");
+    private List<Indicador> indicadores;
 
     @Override
     public void executar(List<String> listaAtivos, Boolean visivel) throws ObjectNotFoundException {
@@ -48,6 +56,7 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 //        WebDriverWait wait = new WebDriverWait(driver, 10);
 //        driver.get(URL_BASE);
         try {
+            indicadores = indicadorRepository.findAll();
             ativosPendentes.forEach(a -> {
                 scrapingIndicador(a, driver);
                 log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
@@ -77,41 +86,61 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
             final WebElement div = webElement.findElement(xpathFilhoDoNodo);
             final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
 
-            final WebElement nomeIndicador = elements.get(0);
-            final List<WebElement> nomeIndicadorElements = nomeIndicador.findElements(xpathFilhoDoNodo);
+            //Buscar nome dos indicadores (Por tipo : VALUATION, ENDIVIDAMENTO, EFICIÊNCIA, RENTABILIDADE, CRESCIMENTO)
+            final WebElement nomeIndicadorLido = elements.get(0);
+            final List<WebElement> nomeIndicadorLidoElements = nomeIndicadorLido.findElements(xpathFilhoDoNodo);
+            final List<String> listaNomeIndicadoresLidos = nomeIndicadorLidoElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
 
-            final List<String> listaNomeIndicadores = nomeIndicadorElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
-
+            // Buscar a matriz de resultados x ano
             final WebElement valorIndicador = elements.get(1);
             final WebElement divContainerValores = valorIndicador.findElement(By.xpath("./child::*"));
             final List<WebElement> listaValorPorAno = divContainerValores.findElements(By.xpath("./child::*"));
+            final Map<String, IndicadorAno> indicadorAnoMap = criarListaDeAnosDosDados(listaValorPorAno.get(0).getText(), ativo);
 
-//            IndicadorAno ano = new IndicadorAno();
-//            final String strAnos = listaValorPorAno.get(0).getText();
-//            final List<String> listaAnos = Arrays.asList(strAnos.split("\n"));
+            // Salvar
+            salvarListaDeAnos(indicadorAnoMap);
 
-            final String strAnos = listaValorPorAno.get(0).getText();
-            final List<String> listaAnos = Arrays.asList(strAnos.split("\n"));
-            Map<String,IndicadorAno> listaAnosHashMap = new HashMap<String,IndicadorAno>();
-//            listaAnos.stream().map(str -> listaAnosHashMap.put(str, new IndicadorAno(Integer.valueOf(str), ativo))).collect(Collectors.toList());
-
-            listaAnos
-                    .stream()
+            listaNomeIndicadoresLidos.stream()
                     .skip(1)
-                    .map(str -> listaAnosHashMap.put(str, new IndicadorAno(Integer.valueOf(str), ativo)))
+                    .map(obj -> salvarResultados(obj, indicadorAnoMap, listaValorPorAno))
                     .collect(Collectors.toList());
 
-            IndicadorResultado resultado = new IndicadorResultado();
-            Indicador indicador = new Indicador();
 
-            //
-//listaValorPorAno.get(3).getText();
+
+            indicadores
+                    .stream()
+                    .filter(i -> "P/VP".equals(i.getNome()))
+                    .findAny();
+
+
+
 
         } catch (ObjectNotFoundException e) {
             log.error(String.format(ATIVO_NAO_EXISTE, codigoAtivo));
             e.printStackTrace();
         }
 
+    }
+
+    private boolean salvarResultados(String nomeIndicador,
+                                     Map<String, IndicadorAno> anosMap, List<WebElement> resultadosWebElement) {
+
+        return true;
+    }
+
+    private void salvarListaDeAnos(Map<String, IndicadorAno> stringIndicadorAnoMap) {
+        indicadorAnoRepository.saveAll(stringIndicadorAnoMap.values());
+    }
+
+    private Map<String, IndicadorAno> criarListaDeAnosDosDados(String strAnos, Ativo ativo) {
+        Map<String,IndicadorAno> listaAnosHashMap = new HashMap<String,IndicadorAno>();
+        final List<String> listaAnos = Arrays.asList(strAnos.split("\n"));
+        listaAnos
+                .stream()
+                .skip(1)
+                .map(str -> listaAnosHashMap.put(str, new IndicadorAno(Integer.valueOf(str), ativo)))
+                .collect(Collectors.toList());
+        return listaAnosHashMap;
     }
 
     private String limparNome(String text) {
