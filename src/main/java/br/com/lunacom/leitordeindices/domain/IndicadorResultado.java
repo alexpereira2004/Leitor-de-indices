@@ -1,5 +1,6 @@
 package br.com.lunacom.leitordeindices.domain;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import java.io.Serializable;
 
 @Entity
 @Data
+@Builder
 public class IndicadorResultado implements Serializable {
     private static final long serialVersionUID = 1L;
 

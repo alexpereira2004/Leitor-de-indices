@@ -3,6 +3,7 @@ package br.com.lunacom.leitordeindices.service;
 import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Indicador;
 import br.com.lunacom.leitordeindices.domain.IndicadorAno;
+import br.com.lunacom.leitordeindices.domain.IndicadorResultado;
 import br.com.lunacom.leitordeindices.repositories.IndicadorAnoRepository;
 import br.com.lunacom.leitordeindices.repositories.IndicadorRepository;
 import javassist.tools.rmi.ObjectNotFoundException;
@@ -75,7 +76,7 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
             String path = String.format("%s/%s/%s", URL_BASE, "acoes", ativo.getCodigo());
             driver.get(path);
 
-            clicaNoBotãoParaListarHistorico(driver);
+            clicaNoBotaoParaListarHistorico(driver);
 
             final List<WebElement> indicators = buscarDadosHistoricoIndicadores(driver);
 
@@ -100,17 +101,16 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
             // Salvar
             salvarListaDeAnos(indicadorAnoMap);
 
+            int index = 0;
             listaNomeIndicadoresLidos.stream()
                     .skip(1)
-                    .map(obj -> salvarResultados(obj, indicadorAnoMap, listaValorPorAno))
+                    .map(obj -> percorrerResultados(listaNomeIndicadoresLidos.indexOf(obj), obj, indicadorAnoMap, listaValorPorAno))
                     .collect(Collectors.toList());
 
-
-
-            indicadores
-                    .stream()
-                    .filter(i -> "P/VP".equals(i.getNome()))
-                    .findAny();
+//            indicadores
+//                    .stream()
+//                    .filter(i -> "P/VP".equals(i.getNome()))
+//                    .findAny();
 
 
 
@@ -122,10 +122,34 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
     }
 
-    private boolean salvarResultados(String nomeIndicador,
-                                     Map<String, IndicadorAno> anosMap, List<WebElement> resultadosWebElement) {
+    private boolean percorrerResultados(int index, String nomeIndicador,
+                                        Map<String, IndicadorAno> anosMap, List<WebElement> resultadosWebElement) {
+        final String linha = resultadosWebElement.get(index).getText();
+        final List<String> resultados = Arrays.asList(linha.split("\n"));
+
+        final Indicador indicador = pesquisaIndicadorDaListaUsando(nomeIndicador);
+
+        anosMap.values()
+                .stream()
+                .forEach( ano -> {
+//                    final String s = resultados.get(0);
+//                    resultados.remove(0);
+                    double resultado = 0;
+//                    if (!s.equals("-")) {
+//                        resultado = Double.parseDouble(s);
+//                    }
+                    salvarResultado(resultado, ano, indicador);
+                });
 
         return true;
+    }
+
+    private void salvarResultado(double resultadoValor, IndicadorAno indicadorAno, Indicador indicador) {
+        final IndicadorResultado resultado = IndicadorResultado.builder()
+                .valor(resultadoValor)
+                .indicadorAno(indicadorAno)
+                .indicador(indicador)
+                .build();
     }
 
     private void salvarListaDeAnos(Map<String, IndicadorAno> stringIndicadorAnoMap) {
@@ -133,13 +157,14 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
     }
 
     private Map<String, IndicadorAno> criarListaDeAnosDosDados(String strAnos, Ativo ativo) {
-        Map<String,IndicadorAno> listaAnosHashMap = new HashMap<String,IndicadorAno>();
+        Map<String,IndicadorAno> listaAnosHashMap = new LinkedHashMap<String,IndicadorAno>();
         final List<String> listaAnos = Arrays.asList(strAnos.split("\n"));
         listaAnos
                 .stream()
                 .skip(1)
                 .map(str -> listaAnosHashMap.put(str, new IndicadorAno(Integer.valueOf(str), ativo)))
                 .collect(Collectors.toList());
+
         return listaAnosHashMap;
     }
 
@@ -147,8 +172,8 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
         return text.split("\\n")[0].trim();
     }
 
-    private void clicaNoBotãoParaListarHistorico(WebDriver driver) {
-        final WebElement element = driver.findElement(By.className("btn-indicator-type"));
+    private void clicaNoBotaoParaListarHistorico(WebDriver driver) {
+        final WebElement element = driver.findElement(By.className("btn-indicator-view-type"));
         final List<WebElement> button = element.findElements(By.tagName("button"));
         button.get(1).click();
     }
@@ -156,5 +181,13 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
     private List<WebElement> buscarDadosHistoricoIndicadores(WebDriver driver) {
         final WebElement container = driver.findElement(By.className("indicator-historical-container"));
         return container.findElements(By.className("indicators"));
+    }
+
+    private Indicador pesquisaIndicadorDaListaUsando(String nome) {
+        return indicadores
+                .stream()
+                .filter(i -> nome.equals(i.getNome()))
+                .findFirst()
+                .get();
     }
 }
