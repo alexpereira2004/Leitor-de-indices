@@ -84,28 +84,58 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 // loop para cada tipo de indicador
 
             final WebElement webElement = indicators.get(0);
+
             final WebElement div = webElement.findElement(xpathFilhoDoNodo);
             final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
 
-            //Buscar nome dos indicadores (Por tipo : VALUATION, ENDIVIDAMENTO, EFICIÊNCIA, RENTABILIDADE, CRESCIMENTO)
+            // Indicadores
             final WebElement nomeIndicadorLido = elements.get(0);
             final List<WebElement> nomeIndicadorLidoElements = nomeIndicadorLido.findElements(xpathFilhoDoNodo);
-            final List<String> listaNomeIndicadoresLidos = nomeIndicadorLidoElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
+            int quantidadeLinhas = nomeIndicadorLidoElements.size();
 
-            // Buscar a matriz de resultados x ano
+            // Anos
             final WebElement valorIndicador = elements.get(1);
             final WebElement divContainerValores = valorIndicador.findElement(By.xpath("./child::*"));
             final List<WebElement> listaValorPorAno = divContainerValores.findElements(By.xpath("./child::*"));
-            final Map<String, IndicadorAno> indicadorAnoMap = criarListaDeAnosDosDados(listaValorPorAno.get(0).getText(), ativo);
+            final String strAnos = listaValorPorAno.get(0).getText();
+            final List<String> listaAnos = Arrays.asList(strAnos.split("\n"));
+            int quantidadeColunas = listaAnos.size() - 1;
 
-            // Salvar
-            salvarListaDeAnos(indicadorAnoMap);
+            final String text = webElement.getText();
+            final String all = text.replaceAll("\nhelp_outline", "").replaceAll("\nshow_chart", "").replaceAll("\nformat_quote", "");
+            Arrays.asList(all.split("\n"));
+            final LinkedList<String> resultados = new LinkedList<>(Arrays.asList(all.split("\n")));
 
-            int index = 0;
-            listaNomeIndicadoresLidos.stream()
-                    .skip(1)
-                    .map(obj -> percorrerResultados(listaNomeIndicadoresLidos.indexOf(obj), obj, indicadorAnoMap, listaValorPorAno))
-                    .collect(Collectors.toList());
+            int i = 0;
+            while ( i < quantidadeLinhas ) {
+                resultados.remove(i);
+                i++;
+            }
+
+            log.info("Até aqui");
+
+//            final WebElement div = webElement.findElement(xpathFilhoDoNodo);
+//            final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
+//
+//            //Buscar nome dos indicadores (Por tipo : VALUATION, ENDIVIDAMENTO, EFICIÊNCIA, RENTABILIDADE, CRESCIMENTO)
+//            final WebElement nomeIndicadorLido = elements.get(0);
+//            final List<WebElement> nomeIndicadorLidoElements = nomeIndicadorLido.findElements(xpathFilhoDoNodo);
+//            final List<String> listaNomeIndicadoresLidos = nomeIndicadorLidoElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
+//
+//            // Buscar a matriz de resultados x ano
+//            final WebElement valorIndicador = elements.get(1);
+//            final WebElement divContainerValores = valorIndicador.findElement(By.xpath("./child::*"));
+//            final List<WebElement> listaValorPorAno = divContainerValores.findElements(By.xpath("./child::*"));
+//            final Map<String, IndicadorAno> indicadorAnoMap = criarListaDeAnosDosDados(listaValorPorAno.get(0).getText(), ativo);
+//
+//            // Salvar
+//            salvarListaDeAnos(indicadorAnoMap);
+//
+//            int index = 0;
+//            listaNomeIndicadoresLidos.stream()
+//                    .skip(1)
+//                    .map(obj -> percorrerResultados(listaNomeIndicadoresLidos.indexOf(obj), obj, indicadorAnoMap, listaValorPorAno))
+//                    .collect(Collectors.toList());
 
 //            indicadores
 //                    .stream()
