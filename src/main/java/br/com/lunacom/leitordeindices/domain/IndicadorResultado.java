@@ -2,6 +2,7 @@ package br.com.lunacom.leitordeindices.domain;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,12 +18,17 @@ public class IndicadorResultado implements Serializable {
     private Integer id;
 
     private double valor;
-
-    @ManyToOne
-    @JoinColumn(name="indicador_ano_id")
-    private IndicadorAno indicadorAno;
+    @NonNull
+    private Integer ano;
+    private Integer semestre;
 
     @ManyToOne
     @JoinColumn(name="indicador_id")
     private Indicador indicador;
+
+    @ManyToOne
+    @JoinColumn(name="ativo_id")
+    @NonNull
+    private Ativo ativo;
+
 }

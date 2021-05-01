@@ -4,7 +4,6 @@ import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Indicador;
 import br.com.lunacom.leitordeindices.domain.IndicadorAno;
 import br.com.lunacom.leitordeindices.domain.IndicadorResultado;
-import br.com.lunacom.leitordeindices.repositories.IndicadorAnoRepository;
 import br.com.lunacom.leitordeindices.repositories.IndicadorRepository;
 import javassist.tools.rmi.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +29,6 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
     @Autowired
     IndicadorRepository indicadorRepository;
-
-    @Autowired
-    IndicadorAnoRepository indicadorAnoRepository;
 
     private final String URL_BASE = "https://statusinvest.com.br";
     private final By xpathFilhoDoNodo = By.xpath("./child::*");
@@ -91,6 +87,7 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
             // Indicadores
             final WebElement nomeIndicadorLido = elements.get(0);
             final List<WebElement> nomeIndicadorLidoElements = nomeIndicadorLido.findElements(xpathFilhoDoNodo);
+            final List<String> listaNomeIndicadoresLidos = nomeIndicadorLidoElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
             int quantidadeLinhas = nomeIndicadorLidoElements.size();
 
             // Anos
@@ -106,13 +103,35 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
             Arrays.asList(all.split("\n"));
             final LinkedList<String> resultados = new LinkedList<>(Arrays.asList(all.split("\n")));
 
-            int i = 0;
-            while ( i < quantidadeLinhas ) {
-                resultados.remove(i);
-                i++;
-            }
 
             log.info("Até aqui");
+
+
+            List<IndicadorResultado> salvar = new ArrayList<>();
+
+            for (int i = 1; i < listaValorPorAno.size(); i++) {
+                final Indicador indicador = pesquisaIndicadorDaListaUsando(listaNomeIndicadoresLidos.get(i));
+
+                String s = (listaValorPorAno.get(i).getText());
+                final List<String> valores = Arrays.asList(s.split("\n"));
+
+                String w = listaValorPorAno.get(0).getText();
+                final List<String> anos = Arrays.asList(w.split("\n"));
+
+                for (int y = 1; y < valores.size(); y++) {
+
+                    salvar.add(
+                            IndicadorResultado
+                            .builder()
+                            .valor(limparValor(valores.get(y)))
+                            .indicador(indicador)
+                            .ano(Integer.valueOf(anos.get(y)))
+                            .ativo(ativo)
+                            .build());
+                }
+            }
+
+            log.info("Dois !!");
 
 //            final WebElement div = webElement.findElement(xpathFilhoDoNodo);
 //            final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
@@ -152,6 +171,13 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
     }
 
+    private double limparValor(String s) {
+        s = s.replace("-%", "0");
+        s = s.replace("%", "");
+        s = s.replace(",", ".");
+        return Double.parseDouble(s);
+    }
+
     private boolean percorrerResultados(int index, String nomeIndicador,
                                         Map<String, IndicadorAno> anosMap, List<WebElement> resultadosWebElement) {
         final String linha = resultadosWebElement.get(index).getText();
@@ -177,13 +203,12 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
     private void salvarResultado(double resultadoValor, IndicadorAno indicadorAno, Indicador indicador) {
         final IndicadorResultado resultado = IndicadorResultado.builder()
                 .valor(resultadoValor)
-                .indicadorAno(indicadorAno)
                 .indicador(indicador)
                 .build();
     }
 
     private void salvarListaDeAnos(Map<String, IndicadorAno> stringIndicadorAnoMap) {
-        indicadorAnoRepository.saveAll(stringIndicadorAnoMap.values());
+//        indicadorAnoRepository.saveAll(stringIndicadorAnoMap.values());
     }
 
     private Map<String, IndicadorAno> criarListaDeAnosDosDados(String strAnos, Ativo ativo) {

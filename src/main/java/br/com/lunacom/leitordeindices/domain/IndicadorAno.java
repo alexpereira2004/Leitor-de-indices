@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
 @Data
 @RequiredArgsConstructor
 public class IndicadorAno implements Serializable {
