@@ -5,6 +5,7 @@ import br.com.lunacom.leitordeindices.domain.Indicador;
 import br.com.lunacom.leitordeindices.domain.IndicadorAno;
 import br.com.lunacom.leitordeindices.domain.IndicadorResultado;
 import br.com.lunacom.leitordeindices.repositories.IndicadorRepository;
+import br.com.lunacom.leitordeindices.repositories.IndicadorResultadoRepository;
 import javassist.tools.rmi.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -29,6 +30,9 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
     @Autowired
     IndicadorRepository indicadorRepository;
+
+    @Autowired
+    IndicadorResultadoRepository indicadorResultadoRepository;
 
     private final String URL_BASE = "https://statusinvest.com.br";
     private final By xpathFilhoDoNodo = By.xpath("./child::*");
@@ -133,35 +137,7 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
             log.info("Dois !!");
 
-//            final WebElement div = webElement.findElement(xpathFilhoDoNodo);
-//            final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
-//
-//            //Buscar nome dos indicadores (Por tipo : VALUATION, ENDIVIDAMENTO, EFICIÊNCIA, RENTABILIDADE, CRESCIMENTO)
-//            final WebElement nomeIndicadorLido = elements.get(0);
-//            final List<WebElement> nomeIndicadorLidoElements = nomeIndicadorLido.findElements(xpathFilhoDoNodo);
-//            final List<String> listaNomeIndicadoresLidos = nomeIndicadorLidoElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
-//
-//            // Buscar a matriz de resultados x ano
-//            final WebElement valorIndicador = elements.get(1);
-//            final WebElement divContainerValores = valorIndicador.findElement(By.xpath("./child::*"));
-//            final List<WebElement> listaValorPorAno = divContainerValores.findElements(By.xpath("./child::*"));
-//            final Map<String, IndicadorAno> indicadorAnoMap = criarListaDeAnosDosDados(listaValorPorAno.get(0).getText(), ativo);
-//
-//            // Salvar
-//            salvarListaDeAnos(indicadorAnoMap);
-//
-//            int index = 0;
-//            listaNomeIndicadoresLidos.stream()
-//                    .skip(1)
-//                    .map(obj -> percorrerResultados(listaNomeIndicadoresLidos.indexOf(obj), obj, indicadorAnoMap, listaValorPorAno))
-//                    .collect(Collectors.toList());
-
-//            indicadores
-//                    .stream()
-//                    .filter(i -> "P/VP".equals(i.getNome()))
-//                    .findAny();
-
-
+            indicadorResultadoRepository.saveAll(salvar);
 
 
         } catch (ObjectNotFoundException e) {
@@ -173,7 +149,9 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
     private double limparValor(String s) {
         s = s.replace("-%", "0");
-        s = s.replace("%", "");
+        s = s.replace("%", "0");
+        s = s.replace("-", "0");
+        s = s.replace(".", "");
         s = s.replace(",", ".");
         return Double.parseDouble(s);
     }
