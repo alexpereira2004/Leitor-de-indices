@@ -13,6 +13,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,12 +56,12 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
         options.setHeadless(invisivel);
 
         WebDriver driver = new FirefoxDriver(options);
-//        WebDriverWait wait = new WebDriverWait(driver, 10);
+        WebDriverWait wait = new WebDriverWait(driver, 10);
 //        driver.get(URL_BASE);
         try {
             indicadores = indicadorRepository.findAll();
             ativosPendentes.forEach(a -> {
-                scrapingIndicador(a, driver);
+                scrapingIndicador(a, driver, wait);
                 log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
                 listaAtivos.remove(a);
             });
@@ -69,75 +71,26 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
         }
     }
 
-    private void scrapingIndicador(String codigoAtivo, WebDriver driver) {
+    private void scrapingIndicador(String codigoAtivo, WebDriver driver, WebDriverWait wait) {
         try {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
 
             String path = String.format("%s/%s/%s", URL_BASE, "acoes", ativo.getCodigo());
             driver.get(path);
 
+            fechaPopupAnuncios(driver, wait);
+
             clicaNoBotaoParaListarHistorico(driver);
 
-            final List<WebElement> indicators = buscarDadosHistoricoIndicadores(driver);
+            final List<WebElement> resultadosTableHtml = buscarDadosHistoricoIndicadores(driver);
 
 
-// loop para cada tipo de indicador
+            lerTabelaHtml(resultadosTableHtml.get(1), ativo);
 
-            final WebElement webElement = indicators.get(0);
-
-            final WebElement div = webElement.findElement(xpathFilhoDoNodo);
-            final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
-
-            // Indicadores
-            final WebElement nomeIndicadorLido = elements.get(0);
-            final List<WebElement> nomeIndicadorLidoElements = nomeIndicadorLido.findElements(xpathFilhoDoNodo);
-            final List<String> listaNomeIndicadoresLidos = nomeIndicadorLidoElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
-            int quantidadeLinhas = nomeIndicadorLidoElements.size();
-
-            // Anos
-            final WebElement valorIndicador = elements.get(1);
-            final WebElement divContainerValores = valorIndicador.findElement(By.xpath("./child::*"));
-            final List<WebElement> listaValorPorAno = divContainerValores.findElements(By.xpath("./child::*"));
-            final String strAnos = listaValorPorAno.get(0).getText();
-            final List<String> listaAnos = Arrays.asList(strAnos.split("\n"));
-            int quantidadeColunas = listaAnos.size() - 1;
-
-            final String text = webElement.getText();
-            final String all = text.replaceAll("\nhelp_outline", "").replaceAll("\nshow_chart", "").replaceAll("\nformat_quote", "");
-            Arrays.asList(all.split("\n"));
-            final LinkedList<String> resultados = new LinkedList<>(Arrays.asList(all.split("\n")));
-
-
-            log.info("Até aqui");
-
-
-            List<IndicadorResultado> salvar = new ArrayList<>();
-
-            for (int i = 1; i < listaValorPorAno.size(); i++) {
-                final Indicador indicador = pesquisaIndicadorDaListaUsando(listaNomeIndicadoresLidos.get(i));
-
-                String s = (listaValorPorAno.get(i).getText());
-                final List<String> valores = Arrays.asList(s.split("\n"));
-
-                String w = listaValorPorAno.get(0).getText();
-                final List<String> anos = Arrays.asList(w.split("\n"));
-
-                for (int y = 1; y < valores.size(); y++) {
-
-                    salvar.add(
-                            IndicadorResultado
-                            .builder()
-                            .valor(limparValor(valores.get(y)))
-                            .indicador(indicador)
-                            .ano(Integer.valueOf(anos.get(y)))
-                            .ativo(ativo)
-                            .build());
-                }
-            }
-
-            log.info("Dois !!");
-
-            indicadorResultadoRepository.saveAll(salvar);
+//            resultadosTableHtml
+//                    .stream()
+//                    .map(e -> lerTabelaHtml(e, ativo))
+//                    .collect(Collectors.toList());
 
 
         } catch (ObjectNotFoundException e) {
@@ -147,10 +100,78 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
     }
 
+    private void fechaPopupAnuncios(WebDriver driver, WebDriverWait wait) {
+        final List<WebElement> popupAdvertising = driver.findElements(By.className("popup-fixed"));
+        final WebElement elementoAlvo = popupAdvertising.get(0);
+        if (!popupAdvertising.isEmpty()) {
+            wait.until(ExpectedConditions.visibilityOf(elementoAlvo));
+            final List<WebElement> advertisingElement = elementoAlvo.findElements(By.className("advertising"));
+            final List<WebElement> div = advertisingElement.get(0).findElements(xpathFilhoDoNodo);
+            final List<WebElement> buttonClose = div.get(0).findElements(xpathFilhoDoNodo);
+            wait.until(ExpectedConditions.elementToBeClickable(buttonClose.get(0)));
+            buttonClose.get(0).click();
+            wait.until(ExpectedConditions.invisibilityOf(elementoAlvo));
+            log.info("Fechou um popup de anúncio");
+        }
+    }
+
+    private boolean lerTabelaHtml(WebElement webElement, Ativo ativo) {
+        final WebElement div = webElement.findElement(xpathFilhoDoNodo);
+        final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
+
+        // Indicadores
+        final WebElement nomeIndicadorLido = elements.get(0);
+        final List<WebElement> nomeIndicadorLidoElements = nomeIndicadorLido.findElements(xpathFilhoDoNodo);
+        final List<String> listaNomeIndicadoresLidos = nomeIndicadorLidoElements.stream().map(e -> limparNome(e.getText())).collect(Collectors.toList());
+        int quantidadeLinhas = nomeIndicadorLidoElements.size();
+
+        // Anos
+        final WebElement valorIndicador = elements.get(1);
+        final WebElement divContainerValores = valorIndicador.findElement(By.xpath("./child::*"));
+        final List<WebElement> listaValorPorAno = divContainerValores.findElements(By.xpath("./child::*"));
+        final String strAnos = listaValorPorAno.get(0).getText();
+        final List<String> listaAnos = Arrays.asList(strAnos.split("\n"));
+        int quantidadeColunas = listaAnos.size() - 1;
+
+        final String text = webElement.getText();
+        final String all = text.replaceAll("\nhelp_outline", "").replaceAll("\nshow_chart", "").replaceAll("\nformat_quote", "");
+        Arrays.asList(all.split("\n"));
+        final LinkedList<String> resultados = new LinkedList<>(Arrays.asList(all.split("\n")));
+
+
+        List<IndicadorResultado> salvar = new ArrayList<>();
+
+        for (int i = 1; i < listaValorPorAno.size(); i++) {
+            final Indicador indicador = pesquisaIndicadorDaListaUsando(listaNomeIndicadoresLidos.get(i));
+
+            String s = (listaValorPorAno.get(i).getText());
+            final List<String> valores = Arrays.asList(s.split("\n"));
+
+            String w = listaValorPorAno.get(0).getText();
+            final List<String> anos = Arrays.asList(w.split("\n"));
+
+            for (int y = 1; y < valores.size(); y++) {
+
+                salvar.add(
+                        IndicadorResultado
+                                .builder()
+                                .valor(limparValor(valores.get(y)))
+                                .indicador(indicador)
+                                .ano(Integer.valueOf(anos.get(y)))
+                                .ativo(ativo)
+                                .build());
+            }
+        }
+
+        log.info("Leu todos os indicadores do ativo "+ativo.getCodigo());
+        indicadorResultadoRepository.saveAll(salvar);
+        return true;
+    }
+
     private double limparValor(String s) {
         s = s.replace("-%", "0");
         s = s.replace("%", "0");
-        s = s.replace("-", "0");
+        s = s.replaceAll("-$","0");
         s = s.replace(".", "");
         s = s.replace(",", ".");
         return Double.parseDouble(s);
