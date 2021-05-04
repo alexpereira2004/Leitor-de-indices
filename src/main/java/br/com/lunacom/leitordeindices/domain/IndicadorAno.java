@@ -1,7 +1,6 @@
 package br.com.lunacom.leitordeindices.domain;
 
 import lombok.Data;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
@@ -15,14 +14,11 @@ public class IndicadorAno implements Serializable {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
-
-    @NonNull
     private Integer ano;
     private Integer semestre;
 
     @ManyToOne
     @JoinColumn(name="ativo_id")
-    @NonNull
     private Ativo ativo;
 
 }

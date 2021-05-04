@@ -16,6 +16,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import static br.com.lunacom.leitordeindices.util.Mensagens.ATIVO_NAO_EXISTE;
 
 @Slf4j
 @Service
+@Transactional
 public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
 
     @Autowired
@@ -66,7 +68,6 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
                 log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
                 listaAtivos.remove(a);
             });
-
         } finally {
             driver.quit();
         }
@@ -75,27 +76,20 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
     private void scrapingIndicador(String codigoAtivo, WebDriver driver, WebDriverWait wait) {
         try {
             final Ativo ativo = ativoService.searchAtivoByCodigo(codigoAtivo);
-
             String path = String.format("%s/%s/%s", URL_BASE, "acoes", ativo.getCodigo());
             driver.get(path);
-
             fechaPopupAnuncios(driver, wait);
-
             clicaNoBotaoParaListarHistorico(driver);
-
             final List<WebElement> resultadosTableHtml = buscarDadosHistoricoIndicadores(driver);
-
+            indicadorResultadoRepository.deleteIndicadorResultadoByAtivo(ativo);
             resultadosTableHtml
                     .stream()
-                    .map(e -> lerTabelaHtml(e, ativo))
+                    .map(e -> lerTabelaHtmlESalvarDados(e, ativo))
                     .collect(Collectors.toList());
-
-
         } catch (ObjectNotFoundException e) {
             log.error(String.format(ATIVO_NAO_EXISTE, codigoAtivo));
             e.printStackTrace();
         }
-
     }
 
     private void fechaPopupAnuncios(WebDriver driver, WebDriverWait wait) {
@@ -113,7 +107,7 @@ public class ScrapingStatusinvestIndicadorService implements ScrapingIndicador {
         }
     }
 
-    private boolean lerTabelaHtml(WebElement webElement, Ativo ativo) {
+    private boolean lerTabelaHtmlESalvarDados(WebElement webElement, Ativo ativo) {
         final WebElement div = webElement.findElement(xpathFilhoDoNodo);
         final List<WebElement> elements = div.findElements(xpathFilhoDoNodo);
 
