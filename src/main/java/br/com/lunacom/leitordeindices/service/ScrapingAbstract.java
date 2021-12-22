@@ -10,17 +10,22 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class ScrapingAbstract {
-//    @Value("${webdriver.gecko.driver}")
-//    private String webdriverGeckoDriver;
+    @Value("${webdriver.gecko.driver}")
+    private String webdriverGeckoDriver;
+
+    @Value("${webdriver.firefox.bin}")
+    private String webdriverFirefoxBin;
 
     @Autowired
     protected AtivoService ativoService;
+
 
     @Autowired
     protected CotacaoService cotacaoService;
@@ -29,11 +34,15 @@ public class ScrapingAbstract {
     CotacaoAtivoDtoToCotacaoAtivoConverter converter;
 
     protected void loop(List<String> listaAtivos, Date dataReferencia, Boolean invisivel) {
+        System.setProperty("webdriver.firefox.bin", webdriverFirefoxBin);
+        System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
+
         List<String> ativosPendentes = new ArrayList<>(listaAtivos);
         FirefoxOptions options = new FirefoxOptions();
         options.setHeadless(invisivel);
 
         WebDriver driver = new FirefoxDriver(options);
+
         WebDriverWait wait = new WebDriverWait(driver, 10);
         driver.get(getUrlBase());
         try {
