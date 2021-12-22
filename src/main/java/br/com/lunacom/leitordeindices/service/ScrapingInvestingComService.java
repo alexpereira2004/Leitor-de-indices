@@ -35,8 +35,8 @@ public class ScrapingInvestingComService extends ScrapingInvestingComAbstract im
 
     private final String origem = "investing";
 
-    @Value("${webdriver.gecko.driver}")
-    private String webdriverGeckoDriver;
+//    @Value("${webdriver.gecko.driver}")
+//    private String webdriverGeckoDriver;
 
     @Override
     public void executar(String referenciaCodigoAtivo, Date dataInicioPesquisa)  {
