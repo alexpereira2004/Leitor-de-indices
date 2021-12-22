@@ -10,16 +10,14 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class ScrapingAbstract {
-    @Value("${webdriver.gecko.driver}")
-    private String webdriverGeckoDriver;
+//    @Value("${webdriver.gecko.driver}")
+//    private String webdriverGeckoDriver;
 
     @Autowired
     protected AtivoService ativoService;

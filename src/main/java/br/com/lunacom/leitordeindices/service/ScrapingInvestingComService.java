@@ -1,6 +1,5 @@
 package br.com.lunacom.leitordeindices.service;
 
-import br.com.lunacom.leitordeindices.converter.Converter;
 import br.com.lunacom.leitordeindices.converter.TabelaTrSiteInvestingComToCotacaoAtivoDtoConverter;
 import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Cotacao;
@@ -11,19 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
-import java.sql.Timestamp;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,8 +30,8 @@ public class ScrapingInvestingComService extends ScrapingInvestingComAbstract im
 
     private final String origem = "investing";
 
-    @Value("${webdriver.gecko.driver}")
-    private String webdriverGeckoDriver;
+//    @Value("${webdriver.gecko.driver}")
+//    private String webdriverGeckoDriver;
 
     @Override
     public void executar(String referenciaCodigoAtivo, Date dataInicioPesquisa)  {
