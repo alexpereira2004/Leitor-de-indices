@@ -12,6 +12,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
@@ -25,10 +26,17 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class ScrapingCotacaoAtualService extends ScrapingInvestingComAbstract implements Scraping {
+    @Value("${webdriver.gecko.driver}")
+    private String webdriverGeckoDriver;
+
+    @Value("${webdriver.firefox.bin}")
+    private String webdriverFirefoxBin;
 
     @Override
     public void executar(String referenciaCodigoAtivo, Date diaAtual) throws ObjectNotFoundException {
-        System.setProperty("webdriver.gecko.driver", "D:/Java/Infra/geckodriver-v0.30.0-win64/geckodriver.exe");
+        System.setProperty("webdriver.firefox.bin", webdriverFirefoxBin);
+        System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
+
         FirefoxOptions options = new FirefoxOptions();
         options.setHeadless(true);
         WebDriver driver = new FirefoxDriver(options);
