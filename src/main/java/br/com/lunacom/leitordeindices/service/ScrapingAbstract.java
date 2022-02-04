@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class ScrapingAbstract {
-//    @Value("${webdriver.gecko.driver}")
-//    private String webdriverGeckoDriver;
+    @Value("${webdriver.gecko.driver}")
+    private String webdriverGeckoDriver;
 
     @Value("${webdriver.firefox.bin}")
     private String webdriverFirefoxBin;
