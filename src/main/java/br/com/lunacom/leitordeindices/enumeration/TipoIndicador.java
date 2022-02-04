@@ -1,4 +1,4 @@
-package enumeration;
+package br.com.lunacom.leitordeindices.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
