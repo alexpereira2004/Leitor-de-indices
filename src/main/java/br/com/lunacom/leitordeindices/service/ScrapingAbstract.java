@@ -43,7 +43,7 @@ public class ScrapingAbstract {
         driver.get(getUrlBase());
         try {
             ativosPendentes.forEach(a -> {
-//                scrapingAtivo(a, dataReferencia, driver, wait);
+                scrapingAtivo(a, dataReferencia, driver, wait);
                 log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
                 listaAtivos.remove(a);
             });
