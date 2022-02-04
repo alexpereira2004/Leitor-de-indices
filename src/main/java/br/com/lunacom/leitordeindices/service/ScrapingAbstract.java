@@ -4,10 +4,9 @@ import br.com.lunacom.leitordeindices.converter.CotacaoAtivoDtoToCotacaoAtivoCon
 import br.com.lunacom.leitordeindices.domain.Ativo;
 import br.com.lunacom.leitordeindices.domain.Cotacao;
 import br.com.lunacom.leitordeindices.domain.dto.CotacaoAtivoDto;
+import br.com.lunacom.leitordeindices.util.WebDriverSingleton;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,22 +37,19 @@ public class ScrapingAbstract {
         System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
 
         List<String> ativosPendentes = new ArrayList<>(listaAtivos);
-        FirefoxOptions options = new FirefoxOptions();
-        options.setHeadless(invisivel);
-
-        WebDriver driver = new FirefoxDriver(options);
+        WebDriver driver = WebDriverSingleton.getInstance(invisivel);
 
         WebDriverWait wait = new WebDriverWait(driver, 10);
         driver.get(getUrlBase());
         try {
             ativosPendentes.forEach(a -> {
-                scrapingAtivo(a, dataReferencia, driver, wait);
+//                scrapingAtivo(a, dataReferencia, driver, wait);
                 log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
                 listaAtivos.remove(a);
             });
 
         } finally {
-            driver.quit();
+//            driver.quit();
         }
     }
 
