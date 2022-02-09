@@ -19,7 +19,7 @@ public class RabbitQMConsumer {
     @Autowired
     private Scraping scrapingSiteAdvfnService;
 
-    @RabbitListener(queues = "${rabbitmq.queue.in}")
+    @RabbitListener(queues = "${rabbitmq.queue.scraping_solicitacao}")
     public void listen(SolicitacaoScrapingMessage solicitacaoScrapingMessage) {
         try {
             scrapingSiteAdvfnService.executar(
