@@ -1,5 +1,7 @@
 package br.com.lunacom.leitordeindices.amq.consumer;
 
+import br.com.lunacom.leitordeindices.amq.producer.ScrapingHistoricoIncidesProducer;
+import br.com.lunacom.leitordeindices.domain.dto.ResultadoScrapingDto;
 import br.com.lunacom.leitordeindices.domain.message.SolicitacaoScrapingMessage;
 import br.com.lunacom.leitordeindices.service.Scraping;
 import javassist.tools.rmi.ObjectNotFoundException;
@@ -19,13 +21,19 @@ public class RabbitQMConsumer {
     @Autowired
     private Scraping scrapingSiteAdvfnService;
 
+    @Autowired
+    ScrapingHistoricoIncidesProducer producer;
+
     @RabbitListener(queues = "${rabbitmq.queue.scraping_solicitacao}")
     public void listen(SolicitacaoScrapingMessage solicitacaoScrapingMessage) {
         try {
+            final String ativo = solicitacaoScrapingMessage.getAtivo();
             scrapingSiteAdvfnService.executar(
-                    new ArrayList<>(Arrays.asList(solicitacaoScrapingMessage.getAtivo())),
+                    new ArrayList<>(Arrays.asList(ativo)),
                     new Date(),false);
             log.info("Message read from Queue : " + solicitacaoScrapingMessage);
+            final ResultadoScrapingDto dto = new ResultadoScrapingDto(ativo);
+            producer.produce(dto);
         } catch (ObjectNotFoundException e) {
             log.error(e.getMessage());
         } catch (Exception e) {
