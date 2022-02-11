@@ -10,7 +10,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,7 +35,7 @@ public class RabbitQMConsumer {
             log.info("Message read from Queue : " + solicitacaoScrapingMessage);
             final ResultadoScrapingDto dto = ResultadoScrapingDto.builder()
                     .ativo(ativo)
-                    .dia(LocalDate.now().toString())
+                    .dia(LocalDateTime.now().toString())
                     .build();
             producer.produce(dto);
         } catch (ObjectNotFoundException e) {
