@@ -25,4 +25,4 @@
 
 ### Diagrama de Classes Services Scraping
 
-[![Home](documents/images/Class-diagram-services.png)]
+![Home](documents/images/Class-diagram-services.png)
