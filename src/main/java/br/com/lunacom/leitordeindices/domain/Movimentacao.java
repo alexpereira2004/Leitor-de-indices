@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
-public class Vendas {
+public class Movimentacao {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -17,6 +17,7 @@ public class Vendas {
     private Integer id;
 
     private String indicacao;
+    private String estrategia;
 
     private Double preco_pago;
     private Double preco_venda;
@@ -27,6 +28,7 @@ public class Vendas {
     private Double diferenca;
     private Date aquisicao;
     private Date venda;
+    private Integer dias;
 
     @ManyToOne
     @JoinColumn(name="ativo_id")

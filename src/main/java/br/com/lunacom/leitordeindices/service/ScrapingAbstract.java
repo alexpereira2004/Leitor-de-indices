@@ -1,49 +1,95 @@
 package br.com.lunacom.leitordeindices.service;
 
+import br.com.lunacom.leitordeindices.converter.CotacaoAtivoDtoToCotacaoAtivoConverter;
 import br.com.lunacom.leitordeindices.domain.Ativo;
-import org.openqa.selenium.By;
+import br.com.lunacom.leitordeindices.domain.Cotacao;
+import br.com.lunacom.leitordeindices.domain.dto.CotacaoAtivoDto;
+import br.com.lunacom.leitordeindices.util.WebDriverSingleton;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public abstract class ScrapingAbstract {
+@Slf4j
+public class ScrapingAbstract {
+    @Value("${webdriver.gecko.driver}")
+    private String webdriverGeckoDriver;
+
+    @Value("${webdriver.firefox.bin}")
+    private String webdriverFirefoxBin;
 
     @Autowired
     protected AtivoService ativoService;
 
+
     @Autowired
     protected CotacaoService cotacaoService;
 
-    protected void pesquisarCaminhoDoAtivo(Ativo ativo, WebDriver driver, WebDriverWait wait) {
-        driver.findElement(By.cssSelector(".searchText")).clear();
-        driver.findElement(By.cssSelector(".searchText")).sendKeys(ativo.getCodigo());
-        driver.findElement(By.cssSelector(".searchGlassIcon")).click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".quatesTable")));
-        final WebElement indices = driver.findElement(By.cssSelector(".quatesTable"));
-        final List<WebElement> linkResultados = ((RemoteWebElement) indices).findElements(By.tagName("a"));
-        wait.until(ExpectedConditions.visibilityOf(linkResultados.get(0)));
-        ativo.setCaminho(linkResultados.get(0).getAttribute("href"));
-        ativoService.update(ativo);
-    }
+    @Autowired
+    CotacaoAtivoDtoToCotacaoAtivoConverter converter;
 
-    protected List<String> parseAtivos(String referenciaCodigoAtivo) {
-        List<String> ativos = new ArrayList<>(Arrays.asList(referenciaCodigoAtivo.split(",")));
-        return ativos;
-    }
+    protected void loop(List<String> listaAtivos, Date dataReferencia, Boolean invisivel) {
+        System.setProperty("webdriver.firefox.bin", webdriverFirefoxBin);
+        System.setProperty("webdriver.gecko.driver", webdriverGeckoDriver);
 
+        List<String> ativosPendentes = new ArrayList<>(listaAtivos);
+        WebDriver driver = WebDriverSingleton.getInstance(invisivel);
 
-    protected void fecharAvisoPrivacidade(WebDriver driver) {
-        final List<WebElement> elements = driver.findElements(By.cssSelector("#onetrust-accept-btn-handler"));
-        if (elements.isEmpty()) {
-            return;
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        driver.get(getUrlBase());
+        try {
+            ativosPendentes.forEach(a -> {
+                scrapingAtivo(a, dataReferencia, driver, wait);
+                log.info(String.format("<<<<< Scraping finalizado para %s >>>>>", a));
+                listaAtivos.remove(a);
+            });
+
+        } finally {
+//            driver.quit();
         }
-        elements.get(0).click();
-    };
+    }
+
+    protected String getUrlBase() {
+        return "" ;
+    }
+
+    protected String scrapingAtivo(String a, Date dataReferencia, WebDriver driver, WebDriverWait wait) {
+        return a;
+    }
+
+    protected void salvarCotacoesPorAtivo(Ativo ativo, Date dataInicioPesquisa, List<CotacaoAtivoDto> dtoList) {
+        final List<Cotacao> cotacoes = converter.encode(dtoList);
+        Collections.sort(cotacoes, Collections.reverseOrder());
+
+        final List<Cotacao> cotacoesExistentes = cotacaoService.findAllByAtivoAndReferenciaGreaterThanEqual(ativo, dataInicioPesquisa);
+        Collections.sort(cotacoesExistentes, Collections.reverseOrder());
+
+        cotacoes.stream()
+                .map(c -> setCotacaoIdSeExistir(c, cotacoesExistentes))
+                .map(c -> setAtivoToList(ativo, c))
+                .collect(Collectors.toList());
+
+        log.info(String.format("Total de cotações encontradas para %s: %s",ativo.getCodigo(), cotacoes.size()));
+        cotacaoService.insertAll(cotacoes);
+    }
+
+    protected Cotacao setCotacaoIdSeExistir(Cotacao cotacao, List<Cotacao> cotacoesExistentes) {
+        final Optional<Cotacao> first = cotacoesExistentes
+                .stream()
+                .filter(c -> cotacao.getReferencia().equals(c.getReferencia()))
+                .findFirst();
+        if (first.isPresent()) {
+            cotacao.setId(first.get().getId());
+        }
+        return cotacao;
+    }
+
+    protected Cotacao setAtivoToList(Ativo a, Cotacao c) {
+        c.setAtivo(a);
+        return c;
+    }
 }

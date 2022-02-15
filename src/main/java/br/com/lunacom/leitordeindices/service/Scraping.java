@@ -16,7 +16,7 @@ public interface Scraping {
             value = { ElementNotInteractableException.class, ElementClickInterceptedException.class },
             maxAttempts = 10
     )
-    void executar(List<String> listaAtivos, Date dataReferencia, Boolean visivel) throws ObjectNotFoundException;
+    void executar(List<String> listaAtivos, Date dataReferencia, Boolean invisivel) throws ObjectNotFoundException;
 
     String getOrigem();
 }

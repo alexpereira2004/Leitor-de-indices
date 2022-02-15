@@ -8,9 +8,7 @@ import javassist.tools.rmi.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +33,7 @@ public class CotacaoService {
         return repo.findAllByAtivoAndReferenciaGreaterThanEqual(a, d);
     }
     public List<Cotacao> findAllByAtivoAndReferenciaAfter(Ativo a, Date d) {
+
         return repo.findAllByAtivoAndReferenciaAfter(a, d);
     }
 
@@ -48,5 +47,12 @@ public class CotacaoService {
         final List<CotacaoAtivoDto> cotacaoAtivoDtoList = cotacoes.stream().map(Cotacao::toCotacaoAtivoDto).collect(Collectors.toList());
         Collections.sort(cotacaoAtivoDtoList, Collections.reverseOrder());
         return cotacaoAtivoDtoList;
+    }
+
+    public Cotacao buscarCotacaoMaisRecente(Ativo ativo) {
+        Optional<Cotacao> optionalCotacao = repo.findTopByAtivoOrderByReferenciaDesc(ativo);
+        return optionalCotacao
+                .orElseThrow(
+                        () -> new NoSuchElementException("Cotação não existe para o "+ ativo.getCodigo()));
     }
 }

@@ -34,7 +34,7 @@ public class ScrapingIbovespaService implements Scraping {
 
     @Override
     public void executar(String codigoAtivo, Date dataInicioPesquisa) throws ObjectNotFoundException {
-        System.setProperty("webdriver.gecko.driver", "C:/WebDriver/bin/geckodriver.exe");
+        System.setProperty("webdriver.gecko.driver", "D:/Java/Infra/geckodriver-v0.30.0-win64/geckodriver.exe");
 
         WebDriver driver = new FirefoxDriver();
         WebDriverWait wait = new WebDriverWait(driver, 10);
